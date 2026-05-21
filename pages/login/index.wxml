@@ -1,0 +1,54 @@
+<!-- pages/login/index.wxml -->
+<view class="login-container">
+  <!-- Logo 区域 -->
+  <view class="logo-section">
+    <view class="logo-icon">🏫</view>
+    <text class="title">山鸣谷应学堂</text>
+    <text class="subtitle">请选择您的身份</text>
+  </view>
+
+  <!-- 角色选择 -->
+  <view class="role-section">
+    <view class="role-buttons">
+      <view 
+        class="role-btn {{selectedRole === 'teacher' ? 'active' : ''}}" 
+        bindtap="onRoleSelect" 
+        data-role="teacher"
+      >
+        <text class="role-icon">👨‍🏫</text>
+        <text class="role-text">教师</text>
+      </view>
+      <view 
+        class="role-btn {{selectedRole === 'student' ? 'active' : ''}}" 
+        bindtap="onRoleSelect" 
+        data-role="student"
+      >
+        <text class="role-icon">👨‍🎓</text>
+        <text class="role-text">学生</text>
+      </view>
+      <view 
+        class="role-btn {{selectedRole === 'parent' ? 'active' : ''}}" 
+        bindtap="onRoleSelect" 
+        data-role="parent"
+      >
+        <text class="role-icon">👨‍👩‍👧</text>
+        <text class="role-text">家长</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 登录按钮 -->
+  <button 
+    class="login-btn {{isLoading ? 'loading' : ''}}" 
+    bindtap="onLogin"
+    disabled="{{isLoading}}"
+  >
+    <text wx:if="{{!isLoading}}">微信授权登录</text>
+    <text wx:if="{{isLoading}}" class="loading-text">登录中...</text>
+  </button>
+
+  <!-- 提示信息 -->
+  <view class="tips">
+    <text class="tip-text">点击登录将获取您的微信头像和昵称</text>
+  </view>
+</view>
