@@ -1,0 +1,63 @@
+<!-- pages/teacher/groupQuestions/index.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="header-name">{{group.name}}</text>
+    <text class="header-meta">{{questions.length}}道题目</text>
+  </view>
+
+  <view wx:if="{{questions.length===0}}" class="empty">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">该组还没有题目</text>
+  </view>
+
+  <view wx:else>
+    <view class="select-bar">
+      <text class="select-all" bindtap="onSelectAll">{{allSelected?'取消全选':'全选'}}</text>
+    </view>
+    <checkbox-group bindchange="onCheckboxChange">
+      <view class="q-card" wx:for="{{questions}}" wx:key="_id">
+        <view class="q-row">
+          <checkbox value="{{item._id}}" checked="{{item.checked}}" />
+          <view class="q-body">
+            <view class="q-type {{item.type}}">{{typeLabel[item.type]}}</view>
+            <text class="q-content">{{item.content}}</text>
+          </view>
+        </view>
+      </view>
+    </checkbox-group>
+  </view>
+
+  <view class="fix-bottom" wx:if="{{questions.length}}">
+    <button class="bottom-btn" bindtap="onRepublish">📤 重新发布</button>
+    <button class="bottom-btn" bindtap="onMoveToGroup">📁 移动到组</button>
+    <button class="bottom-btn danger" bindtap="onRemoveFromGroup">🗑 从组中移除</button>
+  </view>
+
+  <!-- 班级选择弹窗 -->
+  <view class="modal" wx:if="{{showClassModal}}">
+    <view class="modal-mask" bindtap="closeModal"></view>
+    <view class="modal-content">
+      <text class="modal-title">选择班级</text>
+      <view class="class-item {{selClassId===item._id?'active':''}}" wx:for="{{classList}}" wx:key="_id" bindtap="onSelectClass" data-id="{{item._id}}">{{item.name}}</view>
+      <view class="modal-btns">
+        <button class="btn-cancel" bindtap="closeModal">取消</button>
+        <button class="btn-confirm" bindtap="onConfirmRepublish">确认发布</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 组选择弹窗 -->
+  <view class="modal" wx:if="{{showGroupModal}}">
+    <view class="modal-mask" bindtap="closeModal"></view>
+    <view class="modal-content">
+      <text class="modal-title">移动到组</text>
+      <view class="class-item {{selGroupId===item._id?'active':''}}" wx:for="{{groupList}}" wx:key="_id" bindtap="onSelectTargetGroup" data-id="{{item._id}}">
+        <text>{{item.name}}</text>
+      </view>
+      <view class="modal-btns">
+        <button class="btn-cancel" bindtap="closeModal">取消</button>
+        <button class="btn-confirm" bindtap="onConfirmMove">确认移动</button>
+      </view>
+    </view>
+  </view>
+</view>

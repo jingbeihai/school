@@ -5,7 +5,11 @@
     "pages/teacher/profile/index",
     "pages/teacher/classDetail/index",
     "pages/teacher/homeworkList/index",
-    "pages/teacher/publishHomework/index"
+    "pages/teacher/publishHomework/index",
+    "pages/teacher/questionGroups/index",
+    "pages/teacher/groupQuestions/index",
+    "pages/teacher/homeworkHistory/index",
+    "pages/teacher/homeworkDetail/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",

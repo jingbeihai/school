@@ -1,5 +1,126 @@
 <!-- pages/teacher/publishHomework/index.wxml -->
-<view class="placeholder">
-  <text class="icon">✏️</text>
-  <text class="text">发布功能开发中...</text>
+<view class="container">
+
+  <!-- 顶部选项卡 -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab==='ai'?'active':''}}" bindtap="switchTab" data-tab="ai">🤖 AI出题</view>
+    <view class="tab-item {{activeTab==='ocr'?'active':''}}" bindtap="switchTab" data-tab="ocr">📷 图片识别</view>
+    <view class="tab-item {{activeTab==='doc'?'active':''}}" bindtap="switchTab" data-tab="doc">📄 文件识别</view>
+  </view>
+
+  <!-- AI出题 -->
+  <view class="tab-content" wx:if="{{activeTab==='ai'}}">
+    <textarea class="input-area" placeholder="请描述出题需求，例如：10道高三物理牛顿第二定律选择题" value="{{aiPrompt}}" bindinput="onAiPrompt"></textarea>
+    <button class="btn-primary" bindtap="onGenerateAI" loading="{{loading}}">{{loading?'生成中...':'🤖 AI生成试题'}}</button>
+  </view>
+
+  <!-- 图片识别 -->
+  <view class="tab-content" wx:if="{{activeTab==='ocr'}}">
+    <view class="upload-box" bindtap="onChooseImage">
+      <text wx:if="{{!ocrImage}}" class="upload-plus">+</text>
+      <image wx:else src="{{ocrImage}}" mode="aspectFit" class="preview-img" />
+    </view>
+    <text class="hint">点击上传试题图片</text>
+    <view class="btn-row" wx:if="{{ocrImage}}">
+      <button class="btn-secondary" bindtap="onOCR" loading="{{loading}}">识别文字</button>
+      <button class="btn-secondary" bindtap="onOCRToAI" loading="{{loading}}">识别+AI出题</button>
+    </view>
+    <textarea class="input-area" wx:if="{{ocrText}}" value="{{ocrText}}" bindinput="onOcrText"></textarea>
+    <button class="btn-primary" wx:if="{{ocrText}}" bindtap="onOCRTextToAI">用此文本AI出题</button>
+  </view>
+
+  <!-- 文件识别 -->
+  <view class="tab-content" wx:if="{{activeTab==='doc'}}">
+    <view class="upload-box" bindtap="onChooseFile">
+      <text class="upload-plus">+</text>
+    </view>
+    <text class="hint">上传 .txt / .doc / .pdf 文件</text>
+    <text class="file-name" wx:if="{{fileName}}">已选: {{fileName}}</text>
+    <button class="btn-secondary" wx:if="{{fileName}}" bindtap="onParseDoc" loading="{{loading}}">解析文件</button>
+    <textarea class="input-area" wx:if="{{docText}}" value="{{docText}}" bindinput="onDocText"></textarea>
+    <button class="btn-primary" wx:if="{{docText}}" bindtap="onDocTextToAI">用此文本AI出题</button>
+  </view>
+
+  <!-- 题目列表 -->
+  <view class="question-section" wx:if="{{questions.length}}">
+    <view class="section-header">
+      <text class="section-title">生成题目 ({{questions.length}}道)</text>
+      <text class="select-all" bindtap="onSelectAll">{{allSelected?'取消全选':'全选'}}</text>
+    </view>
+    <checkbox-group bindchange="onCheckboxChange">
+      <view class="question-card" wx:for="{{questions}}" wx:key="_id">
+        <view class="q-header">
+          <checkbox value="{{item._id}}" checked="{{item.checked}}" class="q-checkbox" />
+          <text class="q-index">第{{index+1}}题</text>
+          <text class="q-type {{item.type}}">{{typeLabel[item.type]}}</text>
+          <text class="q-diff {{item.difficulty}}">{{diffLabel[item.difficulty]}}</text>
+        </view>
+        <view class="q-content">{{item.content}}</view>
+        <view class="q-options" wx:if="{{item.options && item.options.length}}">
+          <text wx:for="{{item.options}}" wx:key="index" wx:for-item="opt">{{opt}}</text>
+        </view>
+        <view class="q-answer">答案：{{item.answer}}</view>
+        <view class="q-explanation" wx:if="{{item.explanation}}">解析：{{item.explanation}}</view>
+      </view>
+    </checkbox-group>
+
+    <!-- 底部操作栏 -->
+    <view class="bottom-bar">
+      <button class="btn-bar" bindtap="onCollectToGroup">📁 收藏到组</button>
+      <button class="btn-bar primary" bindtap="onPublishHomework">📤 发布作业</button>
+    </view>
+  </view>
+
+  <!-- 收藏组和已发作业快捷入口 -->
+  <view class="quick-section" wx:if="{{!questions.length}}">
+    <view class="quick-card" bindtap="goGroups">
+      <view class="quick-icon">📁</view>
+      <view class="quick-info">
+        <text class="quick-title">收藏试题</text>
+        <text class="quick-sub">{{groupCount}}个收藏组</text>
+      </view>
+      <text class="quick-arrow">→</text>
+    </view>
+    <view class="quick-card" bindtap="goHomeworkHistory">
+      <view class="quick-icon">📚</view>
+      <view class="quick-info">
+        <text class="quick-title">已发作业</text>
+        <text class="quick-sub">{{homeworkCount}}份作业</text>
+      </view>
+      <text class="quick-arrow">→</text>
+    </view>
+  </view>
+
+  <!-- 发布弹窗 -->
+  <view class="modal" wx:if="{{showPublishModal}}">
+    <view class="modal-mask" bindtap="closeModal"></view>
+    <view class="modal-content">
+      <text class="modal-title">选择发布班级</text>
+      <view class="class-item {{selClassId===item._id?'active':''}}" wx:for="{{classList}}" wx:key="_id" bindtap="onSelectClass" data-id="{{item._id}}">{{item.name}}</view>
+      <view class="modal-btns">
+        <button class="btn-cancel" bindtap="closeModal">取消</button>
+        <button class="btn-confirm" bindtap="onConfirmPublish" loading="{{publishing}}">确认发布</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收藏弹窗 -->
+  <view class="modal" wx:if="{{showCollectModal}}">
+    <view class="modal-mask" bindtap="closeModal"></view>
+    <view class="modal-content">
+      <text class="modal-title">添加到收藏组</text>
+      <view class="group-item {{selGroupId===item._id?'active':''}}" wx:for="{{groupList}}" wx:key="_id" bindtap="onSelectGroup" data-id="{{item._id}}">
+        <text>{{item.name}}</text>
+        <text class="group-count">{{item.questionCount||0}}题</text>
+      </view>
+      <view class="new-group" bindtap="onNewGroup">
+        <text>+ 新建收藏组</text>
+      </view>
+      <view class="modal-btns">
+        <button class="btn-cancel" bindtap="closeModal">取消</button>
+        <button class="btn-confirm" bindtap="onConfirmCollect" loading="{{collecting}}">确认添加</button>
+      </view>
+    </view>
+  </view>
+
 </view>

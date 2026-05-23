@@ -1,6 +1,4 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "发布",
-  "navigationBarBackgroundColor": "#667eea",
-  "navigationBarTextStyle": "white"
+  "navigationBarTitleText": "发布作业"
 }
