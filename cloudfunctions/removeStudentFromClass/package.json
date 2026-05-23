@@ -1,0 +1,7 @@
+{
+  "name": "removeStudentFromClass",
+  "version": "1.0.0",
+  "description": "从班级移除学生",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "latest" }
+}

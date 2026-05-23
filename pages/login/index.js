@@ -96,14 +96,19 @@ Page({
   // 根据角色跳转
   navigateByRole(role) {
     const pagePaths = {
-      'teacher': '/pages/teacher/home/index',
+      'teacher': '/pages/teacher/homeworkList/index',
       'student': '/pages/student/home/index',
       'parent': '/pages/parent/home/index'
     }
 
     const path = pagePaths[role]
     if (path) {
-      wx.redirectTo({ url: path })
+      // tabBar 页面必须用 switchTab
+      if (role === 'teacher') {
+        wx.switchTab({ url: path })
+      } else {
+        wx.redirectTo({ url: path })
+      }
     } else {
       wx.showToast({ title: '登录成功，首页开发中', icon: 'none' })
     }

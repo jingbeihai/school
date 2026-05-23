@@ -1,0 +1,88 @@
+<!-- pages/teacher/classDetail/index.wxml -->
+<view class="container" wx:if="{{classInfo}}">
+
+  <!-- 班级信息头部 -->
+  <view class="header-card">
+    <view class="header-top">
+      <text class="class-name">{{classInfo.name}}</text>
+      <text class="edit-btn" bindtap="onEditClassName">修改</text>
+    </view>
+    <view class="invite-row" bindtap="onCopyInviteCode">
+      <text class="invite-label">邀请码：</text>
+      <text class="invite-code">{{classInfo.inviteCode}}</text>
+      <text class="copy-tip">（点击复制）</text>
+    </view>
+    <view class="meta-row">
+      <text class="meta-item">创建时间：{{classInfo.createTimeStr}}</text>
+      <text class="meta-item">学生人数：{{students.length}}人</text>
+    </view>
+  </view>
+
+  <!-- 学生列表 -->
+  <view class="student-section">
+    <view class="section-top">
+      <text class="section-title">学生列表</text>
+      <text class="add-student-btn" bindtap="onShowAddStudent">+ 添加学生</text>
+    </view>
+
+    <view class="student-list">
+      <view class="student-item" wx:for="{{students}}" wx:key="_id" bindtap="onStudentTap" data-id="{{item.studentId}}" data-name="{{item.studentName}}">
+        <image class="student-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="student-info">
+          <text class="student-name">{{item.studentName}}</text>
+          <text class="student-code">编号：{{item.userCode || '无'}} ｜ 家长：{{item.parentName}}</text>
+        </view>
+        <text class="arrow">›</text>
+      </view>
+      <view class="empty-tip" wx:if="{{students.length === 0}}">
+        <text>暂无学生，点击上方按钮添加</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部删除按钮 -->
+  <view class="bottom-actions">
+    <button class="delete-class-btn" bindtap="onDeleteClass">删除班级</button>
+  </view>
+
+</view>
+
+<!-- 修改班级名称弹窗 -->
+<view class="modal-mask" wx:if="{{showEditModal}}" bindtap="onCloseEditModal"></view>
+<view class="modal-dialog" wx:if="{{showEditModal}}">
+  <text class="modal-title">修改班级名称</text>
+  <input class="modal-input" placeholder="班级名称" value="{{editName}}" bindinput="onEditNameInput"/>
+  <view class="modal-btns">
+    <button class="modal-btn cancel" bindtap="onCloseEditModal">取消</button>
+    <button class="modal-btn confirm" bindtap="onConfirmEdit" loading="{{saving}}">保存</button>
+  </view>
+</view>
+
+<!-- 添加学生弹窗 -->
+<view class="modal-mask" wx:if="{{showAddModal}}" bindtap="onCloseAddModal"></view>
+<view class="modal-dialog" wx:if="{{showAddModal}}">
+  <text class="modal-title">添加学生</text>
+  <text class="modal-sub">输入学生的6位编号</text>
+  <input class="modal-input" type="number" maxlength="6" placeholder="学生编号" value="{{addUserCode}}" bindinput="onAddCodeInput"/>
+  <view class="modal-btns">
+    <button class="modal-btn cancel" bindtap="onCloseAddModal">取消</button>
+    <button class="modal-btn confirm" bindtap="onConfirmAdd" loading="{{adding}}">添加</button>
+  </view>
+</view>
+
+<!-- 学生详情弹窗 -->
+<view class="modal-mask" wx:if="{{showStudentModal}}" bindtap="onCloseStudentModal"></view>
+<view class="modal-dialog" wx:if="{{showStudentModal}}">
+  <text class="modal-title">{{studentDetail.studentName}}</text>
+  <view class="detail-rows">
+    <view class="detail-row"><text class="dl">昵称</text><text class="dv">{{studentDetail.nickName || '无'}}</text></view>
+    <view class="detail-row"><text class="dl">手机号</text><text class="dv">{{studentDetail.phone || '未填写'}}</text></view>
+    <view class="detail-row"><text class="dl">编号</text><text class="dv">{{studentDetail.userCode || '无'}}</text></view>
+    <view class="detail-row"><text class="dl">会员</text><text class="dv">{{studentDetail.isVip ? '是' : '否'}}</text></view>
+    <view class="detail-row"><text class="dl">状态</text><text class="dv">{{studentDetail.status === 'active' ? '正常' : '禁用'}}</text></view>
+  </view>
+  <view class="modal-btns">
+    <button class="modal-btn danger" bindtap="onRemoveStudent">移除学生</button>
+    <button class="modal-btn confirm" bindtap="onCloseStudentModal">关闭</button>
+  </view>
+</view>

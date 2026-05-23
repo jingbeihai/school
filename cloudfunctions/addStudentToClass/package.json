@@ -1,0 +1,7 @@
+{
+  "name": "addStudentToClass",
+  "version": "1.0.0",
+  "description": "添加学生到班级",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "latest" }
+}

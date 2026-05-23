@@ -1,0 +1,5 @@
+<!-- pages/teacher/publishHomework/index.wxml -->
+<view class="placeholder">
+  <text class="icon">✏️</text>
+  <text class="text">发布功能开发中...</text>
+</view>

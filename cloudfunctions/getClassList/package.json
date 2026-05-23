@@ -1,0 +1,7 @@
+{
+  "name": "getClassList",
+  "version": "1.0.0",
+  "description": "获取班级列表",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "latest" }
+}

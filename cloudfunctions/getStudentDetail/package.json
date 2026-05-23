@@ -1,0 +1,7 @@
+{
+  "name": "getStudentDetail",
+  "version": "1.0.0",
+  "description": "获取学生详情",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "latest" }
+}
