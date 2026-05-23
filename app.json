@@ -2,7 +2,6 @@
   "pages": [
     "pages/login/index",
     "pages/index/index",
-    "pages/logs/logs",
     "pages/teacher/profile/index",
     "pages/teacher/classDetail/index",
     "pages/teacher/homeworkList/index",
