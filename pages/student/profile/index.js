@@ -66,11 +66,21 @@ Page({
       if (res.result.success) {
         const list = (res.result.list || []).map((item, i) => {
           const colors = CARD_GRADIENTS[i % CARD_GRADIENTS.length]
-          return { ...item, bgColor: colors[0], bgColor2: colors[1] }
+          const joinTime = item.joinTime ? this.formatDate(item.joinTime) : ''
+          return { ...item, bgColor: colors[0], bgColor2: colors[1], joinTimeText: joinTime }
         })
         this.setData({ classList: list })
       }
     }).catch(err => console.error(err))
+  },
+
+  formatDate(dateStr) {
+    if (!dateStr) return ''
+    const d = new Date(dateStr)
+    const y = d.getFullYear()
+    const m = (d.getMonth() + 1).toString().padStart(2, '0')
+    const day = d.getDate().toString().padStart(2, '0')
+    return y + '/' + m + '/' + day
   },
 
   // 退出登录
@@ -202,5 +212,37 @@ Page({
   onOpenClass(e) {
     const id = e.currentTarget.dataset.id
     wx.navigateTo({ url: '/pages/student/classDetail/index?classId=' + id })
+  },
+
+  // 长按退出班级
+  onLeaveClass(e) {
+    const id = e.currentTarget.dataset.id
+    const name = e.currentTarget.dataset.name || '该班级'
+    wx.showModal({
+      title: '退出班级',
+      content: '确定要退出「' + name + '」吗？退出后老师布置的作业将不再向你推送。',
+      confirmText: '确定退出',
+      confirmColor: '#e74c3c',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '退出中...' })
+          wx.cloud.callFunction({
+            name: 'leaveClass',
+            data: { classId: id }
+          }).then(res => {
+            wx.hideLoading()
+            if (res.result.success) {
+              wx.showToast({ title: '已退出', icon: 'success' })
+              this.fetchClassList()
+            } else {
+              wx.showToast({ title: res.result.message || '退出失败', icon: 'none' })
+            }
+          }).catch(() => {
+            wx.hideLoading()
+            wx.showToast({ title: '网络错误', icon: 'none' })
+          })
+        }
+      }
+    })
   }
 })

@@ -31,11 +31,16 @@
     </view>
 
     <!-- 已有班级卡片 -->
-    <view class="class-card" wx:for="{{classList}}" wx:key="_id" bindtap="onOpenClass" data-id="{{item._id}}">
+    <view class="class-card" wx:for="{{classList}}" wx:key="_id" bindtap="onOpenClass" data-id="{{item._id}}" bindlongpress="onLeaveClass" data-id="{{item._id}}" data-name="{{item.name}}">
       <view class="card-bg" style="background: linear-gradient(135deg, {{item.bgColor || '#667eea'}} 0%, {{item.bgColor2 || '#764ba2'}} 100%);"></view>
       <view class="card-overlay">
         <text class="card-name">{{item.name}}</text>
-        <text class="card-count">{{item.studentCount || 0}}名同学</text>
+        <text class="card-teacher">👩‍🏫 {{item.teacherName || '未知'}}</text>
+        <text class="card-code">🔑 {{item.inviteCode || ''}}</text>
+        <view class="card-bottom">
+          <text class="card-count">{{item.studentCount || 0}}人</text>
+          <text class="card-time">{{item.joinTimeText || ''}}</text>
+        </view>
       </view>
     </view>
   </view>

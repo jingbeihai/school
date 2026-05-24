@@ -30,11 +30,16 @@ exports.main = async (event, context) => {
       .orderBy('createTime', 'desc')
       .get()
 
-    // 为每个班级查询学生数量
+    // 为每个班级查询学生数量，同时获取当前学生的 joinTime
     const list = await Promise.all(classRes.data.map(async (cls) => {
       const countRes = await db.collection('class_students')
         .where({ classId: cls._id, status: 'active' })
         .count()
+
+      // 获取当前学生的加入时间
+      const relation = relationRes.data.find(r => r.classId === cls._id)
+      const joinTime = relation ? relation.joinTime : null
+
       return {
         _id: cls._id,
         name: cls.name,
@@ -43,7 +48,8 @@ exports.main = async (event, context) => {
         inviteCode: cls.inviteCode,
         createTime: cls.createTime,
         status: cls.status,
-        studentCount: countRes.total
+        studentCount: countRes.total,
+        joinTime: joinTime
       }
     }))
 
