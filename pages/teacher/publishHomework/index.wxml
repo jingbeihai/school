@@ -44,6 +44,7 @@
   <!-- 题目列表 -->
   <view class="question-section" wx:if="{{questions.length}}">
     <view class="section-header">
+      <text class="back-btn" bindtap="goHome">← 返回题库</text>
       <text class="section-title">生成题目 ({{questions.length}}道)</text>
       <text class="select-all" bindtap="onSelectAll">{{allSelected?'取消全选':'全选'}}</text>
     </view>

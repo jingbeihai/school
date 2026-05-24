@@ -54,6 +54,10 @@ Page({
     this.setData({ activeTab: e.currentTarget.dataset.tab })
   },
 
+  goHome() {
+    this.setData({ questions: [], allSelected: false })
+  },
+
   // ========== AI出题 ==========
   onAiPrompt(e) { this.setData({ aiPrompt: e.detail.value }) },
 

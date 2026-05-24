@@ -35,6 +35,7 @@
 /* 题目列表 */
 .question-section { padding: 0 24rpx; }
 .section-header { display: flex; justify-content: space-between; align-items: center; padding: 20rpx 10rpx; }
+.back-btn { font-size: 26rpx; color: #667eea; flex-shrink: 0; margin-right: 16rpx; }
 .section-title { font-size: 30rpx; font-weight: bold; color: #333; }
 .select-all { font-size: 26rpx; color: #667eea; }
 
