@@ -1,4 +1,6 @@
 // pages/teacher/homeworkDetail/index.js
+const { formatDate } = require('../../../utils/util.js')
+
 Page({
   data: {
     homeworkId: '', homework: null, questions: [], allSelected: false,
@@ -18,8 +20,9 @@ Page({
     wx.cloud.callFunction({ name: 'getHomeworkQuestions', data: { homeworkId: this.data.homeworkId } }).then(res => {
       wx.hideLoading()
       const r = res.result
+      const hw = r.homework ? { ...r.homework, publishTime: formatDate(r.homework.publishTime), deadline: formatDate(r.homework.deadline) } : null
       const qs = (r.questions || []).map(q => ({ ...q, checked: false }))
-      this.setData({ homework: r.homework, questions: qs, allSelected: false })
+      this.setData({ homework: hw, questions: qs, allSelected: false })
     }).catch(() => { wx.hideLoading() })
   },
 

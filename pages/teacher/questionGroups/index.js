@@ -1,4 +1,6 @@
 // pages/teacher/questionGroups/index.js
+const { formatDate } = require('../../../utils/util.js')
+
 Page({
   data: { groups: [] },
 
@@ -8,7 +10,11 @@ Page({
     wx.showLoading({ title: '加载中' })
     wx.cloud.callFunction({ name: 'getGroups' }).then(res => {
       wx.hideLoading()
-      this.setData({ groups: res.result?.groups || [] })
+      const groups = (res.result?.groups || []).map(item => ({
+        ...item,
+        updateTime: formatDate(item.updateTime)
+      }))
+      this.setData({ groups })
     }).catch(() => { wx.hideLoading() })
   },
 

@@ -1,4 +1,6 @@
 // pages/teacher/homeworkHistory/index.js
+const { formatDate } = require('../../../utils/util.js')
+
 Page({
   data: { list: [] },
 
@@ -8,7 +10,12 @@ Page({
     wx.showLoading({ title: '加载中' })
     wx.cloud.callFunction({ name: 'getHomeworkList' }).then(res => {
       wx.hideLoading()
-      this.setData({ list: res.result?.homeworkList || [] })
+      const list = (res.result?.homeworkList || []).map(item => ({
+        ...item,
+        publishTime: formatDate(item.publishTime),
+        deadline: formatDate(item.deadline)
+      }))
+      this.setData({ list })
     }).catch(() => { wx.hideLoading() })
   },
 

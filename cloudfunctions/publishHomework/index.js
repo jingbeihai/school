@@ -57,24 +57,6 @@ exports.main = async (event) => {
       }).catch(() => {})
     }
 
-    // 自动创建收藏组
-    try {
-      const groupRes = await db.collection('question_groups').add({
-        data: {
-          teacherId,
-          name: title,
-          description: `作业"${title}"的题目`,
-          createTime: now,
-          updateTime: now
-        }
-      })
-      for (const qId of questionIds) {
-        await db.collection('group_questions').add({
-          data: { groupId: groupRes._id, questionId: qId, addTime: now }
-        })
-      }
-    } catch (e) { /* 不阻塞主流程 */ }
-
     return { success: true, homeworkId }
   } catch (err) {
     console.error('publishHomework error:', err)

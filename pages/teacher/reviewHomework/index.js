@@ -1,3 +1,5 @@
+const { formatDate } = require('../../../utils/util.js')
+
 Page({
   data: {
     homeworkId: '',
@@ -23,8 +25,9 @@ Page({
       wx.hideLoading()
       const r = res.result
       if (r.success) {
+        const hw = { ...r.homework, deadline: formatDate(r.homework.deadline) }
         this.setData({
-          homework: r.homework,
+          homework: hw,
           students: r.students,
           filteredStudents: r.students,
           loading: false
