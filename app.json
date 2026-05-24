@@ -16,6 +16,7 @@
     "pages/student/homework/index",
     "pages/student/homeworkDetail/index",
     "pages/student/questionBank/index",
+    "pages/student/groupDetail/index",
     "pages/student/classDetail/index"
   ],
   "window": {

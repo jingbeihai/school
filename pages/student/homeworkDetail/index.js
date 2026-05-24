@@ -10,6 +10,12 @@ Page({
     // 答题模式
     answers: {},        // { questionId: answerString }
     submitting: false,
+    // 收藏模式
+    allFavSelected: false,
+    showFavModal: false,
+    favGroups: [],
+    selFavGroupId: '',
+    favNewName: '',
     // 类型/难度映射
     typeLabel: { single_choice: '单选', multiple_choice: '多选', fill_blank: '填空', essay: '简答' },
     diffLabel: { easy: '简单', medium: '中等', hard: '困难' }
@@ -164,5 +170,108 @@ Page({
       this.setData({ submitting: false })
       wx.showToast({ title: '网络错误', icon: 'none' })
     })
+  },
+
+  // ===== 收藏功能 =====
+
+  // 已提交模式下勾选题目
+  onFavCheck(e) {
+    const vals = e.detail.value
+    const questions = this.data.questions.map(q => ({
+      ...q, _checked: vals.includes(q._id)
+    }))
+    this.setData({
+      questions,
+      allFavSelected: vals.length === questions.length
+    })
+  },
+
+  // 全选/取消全选
+  onFavSelectAll() {
+    const allChecked = !this.data.allFavSelected
+    const questions = this.data.questions.map(q => ({
+      ...q, _checked: allChecked
+    }))
+    this.setData({ questions, allFavSelected: allChecked })
+  },
+
+  // 获取已勾选的题目 IDs
+  getFavSelectedIds() {
+    return this.data.questions.filter(q => q._checked).map(q => q._id)
+  },
+
+  // 打开收藏弹窗
+  onOpenFavModal() {
+    const ids = this.getFavSelectedIds()
+    if (!ids.length) return wx.showToast({ title: '请至少勾选一题', icon: 'none' })
+
+    wx.cloud.callFunction({ name: 'getStudentGroups', data: { type: 'collection' } }).then(res => {
+      if (res.result.success) {
+        this.setData({
+          showFavModal: true,
+          favGroups: res.result.groups || [],
+          selFavGroupId: '',
+          favNewName: ''
+        })
+      } else {
+        wx.showToast({ title: res.result.message || '加载收藏组失败', icon: 'none' })
+      }
+    }).catch(() => {
+      wx.showToast({ title: '加载收藏组失败', icon: 'none' })
+    })
+  },
+
+  closeFavModal() {
+    this.setData({ showFavModal: false })
+  },
+
+  onSelectFavGroup(e) {
+    this.setData({ selFavGroupId: e.currentTarget.dataset.id, favNewName: '' })
+  },
+
+  onFavNewNameInput(e) {
+    this.setData({ favNewName: e.detail.value, selFavGroupId: '' })
+  },
+
+  // 确认收藏
+  confirmFav() {
+    const { selFavGroupId, favNewName, homeworkId, questions } = this.data
+    const ids = this.getFavSelectedIds()
+
+    const doAdd = (groupId) => {
+      wx.cloud.callFunction({
+        name: 'addQuestionsToStudentGroup',
+        data: { groupId, questionIds: ids, homeworkId }
+      }).then(res => {
+        if (res.result.success) {
+          wx.showToast({ title: '收藏成功', icon: 'success' })
+          this.setData({ showFavModal: false })
+        } else {
+          wx.showToast({ title: res.result.message, icon: 'none' })
+        }
+      }).catch(() => {
+        wx.showToast({ title: '网络错误', icon: 'none' })
+      })
+    }
+
+    if (favNewName.trim()) {
+      // 创建新组并入题
+      wx.cloud.callFunction({
+        name: 'createStudentGroup',
+        data: { name: favNewName.trim(), type: 'collection' }
+      }).then(res => {
+        if (res.result.success) {
+          doAdd(res.result.groupId)
+        } else {
+          wx.showToast({ title: res.result.message, icon: 'none' })
+        }
+      }).catch(() => {
+        wx.showToast({ title: '创建失败', icon: 'none' })
+      })
+    } else if (selFavGroupId) {
+      doAdd(selFavGroupId)
+    } else {
+      wx.showToast({ title: '请选择收藏组或输入新组名', icon: 'none' })
+    }
   }
 })

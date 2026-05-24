@@ -215,3 +215,65 @@
 .submit-btn[disabled] {
   opacity: 0.7;
 }
+
+/* 收藏选择栏 */
+.fav-select-bar {
+  padding: 16rpx 30rpx;
+  display: flex; justify-content: flex-end;
+  background: #fff; border-bottom: 1rpx solid #f0f0f0;
+}
+.fav-select-bar .select-all {
+  font-size: 26rpx; color: #667eea; padding: 8rpx 20rpx;
+}
+
+/* 收藏checkbox */
+.q-fav-checkbox {
+  margin-right: 4rpx; transform: scale(0.75);
+}
+
+/* 收藏底部栏 */
+.fav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  padding: 20rpx 30rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom) + 100rpx);
+  background: #fff;
+  box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.06);
+  z-index: 10;
+}
+.fav-btn {
+  width: 100%; height: 88rpx;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff; font-size: 30rpx; font-weight: 600;
+  border-radius: 16rpx; display: flex; align-items: center;
+  justify-content: center; border: none;
+}
+
+/* 弹窗 */
+.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200; display: flex; align-items: flex-end; }
+.modal-mask { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); }
+.modal-content {
+  position: relative; width: 100%; background: #fff;
+  border-radius: 32rpx 32rpx 0 0; padding: 40rpx 30rpx;
+  max-height: 70vh; overflow-y: auto;
+}
+.modal-title { font-size: 34rpx; font-weight: bold; text-align: center; display: block; margin-bottom: 30rpx; }
+
+.fav-section { margin-bottom: 30rpx; }
+.fav-section-title { font-size: 26rpx; color: #999; margin-bottom: 16rpx; display: block; }
+.fav-group-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22rpx 24rpx; background: #f9f9f9; border-radius: 12rpx;
+  margin-bottom: 12rpx; font-size: 28rpx;
+}
+.fav-group-item.active { background: #e8eaff; color: #667eea; border: 2rpx solid #667eea; }
+.fav-count { font-size: 22rpx; color: #999; }
+.fav-empty-tip { font-size: 24rpx; color: #ccc; text-align: center; padding: 20rpx 0; }
+.fav-input {
+  width: 100%; height: 80rpx; background: #f9f9f9; border-radius: 12rpx;
+  padding: 0 24rpx; font-size: 28rpx; box-sizing: border-box;
+}
+
+.modal-btns { display: flex; gap: 24rpx; margin-top: 10rpx; }
+.btn-cancel, .btn-confirm { flex: 1; height: 80rpx; line-height: 80rpx; border-radius: 40rpx; font-size: 28rpx; border: none; }
+.btn-cancel { background: #f0f0f0; color: #666; }
+.btn-confirm { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }

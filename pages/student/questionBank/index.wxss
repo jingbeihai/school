@@ -1,12 +1,64 @@
 /* pages/student/questionBank/index.wxss */
-page { background: #f5f5f5; }
-.placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  padding-bottom: 200rpx;
+.container { min-height: 100vh; background: #f5f5f5; padding-bottom: 120rpx; }
+
+.tab-bar { display: flex; background: #fff; border-bottom: 1rpx solid #eee; }
+.tab-item {
+  flex: 1; text-align: center; padding: 24rpx 0; font-size: 28rpx;
+  color: #999; position: relative;
 }
-.placeholder-icon { font-size: 100rpx; margin-bottom: 30rpx; }
-.placeholder-text { font-size: 28rpx; color: #999; }
+.tab-item.active { color: #667eea; font-weight: bold; }
+.tab-item.active::after {
+  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 60rpx; height: 4rpx; background: #667eea; border-radius: 2rpx;
+}
+
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; }
+.empty-icon { font-size: 100rpx; margin-bottom: 30rpx; }
+.empty-text { font-size: 28rpx; color: #999; margin-bottom: 40rpx; }
+.btn-new {
+  background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;
+  border-radius: 40rpx; font-size: 28rpx; border: none; padding: 16rpx 60rpx;
+}
+
+.hint-bar { font-size: 22rpx; color: #999; text-align: center; padding: 12rpx 0; margin-bottom: 8rpx; }
+
+.group-list { padding: 0 20rpx; }
+.group-item {
+  display: flex; align-items: center; background: #fff; border-radius: 16rpx;
+  padding: 30rpx; margin-bottom: 16rpx; box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+.group-info { flex: 1; }
+.group-name { font-size: 30rpx; color: #333; font-weight: bold; display: block; margin-bottom: 6rpx; }
+.group-meta { font-size: 22rpx; color: #bbb; }
+.arrow { font-size: 36rpx; color: #ccc; }
+
+.fab {
+  position: fixed; bottom: 60rpx; right: 40rpx; width: 100rpx; height: 100rpx;
+  background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;
+  font-size: 50rpx; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; box-shadow: 0 6rpx 24rpx rgba(102,126,234,0.4);
+  z-index: 99;
+}
+
+/* 弹窗 */
+.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200; display: flex; align-items: center; justify-content: center; }
+.modal-mask { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); }
+.modal-content {
+  position: relative; width: 580rpx; background: #fff; border-radius: 24rpx;
+  padding: 40rpx 30rpx;
+}
+.modal-title { font-size: 34rpx; font-weight: bold; text-align: center; display: block; margin-bottom: 30rpx; }
+.type-row { display: flex; gap: 20rpx; margin-bottom: 24rpx; }
+.type-btn {
+  flex: 1; text-align: center; padding: 16rpx 0; border-radius: 12rpx;
+  font-size: 26rpx; border: 2rpx solid #e0e0e0; color: #666;
+}
+.type-btn.active { border-color: #667eea; color: #667eea; background: #f0f0ff; }
+.name-input {
+  width: 100%; height: 80rpx; background: #f9f9f9; border-radius: 12rpx;
+  padding: 0 24rpx; font-size: 28rpx; box-sizing: border-box; margin-bottom: 24rpx;
+}
+.modal-btns { display: flex; gap: 24rpx; }
+.btn-cancel, .btn-confirm { flex: 1; height: 80rpx; line-height: 80rpx; border-radius: 40rpx; font-size: 28rpx; border: none; }
+.btn-cancel { background: #f0f0f0; color: #666; }
+.btn-confirm { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }

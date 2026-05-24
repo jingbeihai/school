@@ -11,36 +11,78 @@
     </view>
   </view>
 
+  <!-- 已提交模式：全选栏 -->
+  <view class="fav-select-bar" wx:if="{{submitted && questions.length}}">
+    <text class="select-all" bindtap="onFavSelectAll">
+      {{allFavSelected ? '取消全选' : '全选'}}
+    </text>
+  </view>
+
   <!-- 题目列表 -->
-  <view class="q-list">
+  <checkbox-group wx:if="{{submitted}}" bindchange="onFavCheck">
+    <view class="q-list">
+      <view class="q-card {{item._id}}" wx:for="{{questions}}" wx:key="_id">
+        <!-- 已提交模式：checkbox -->
+        <view class="q-header">
+          <checkbox value="{{item._id}}" checked="{{item._checked || false}}" class="q-fav-checkbox" />
+          <text class="q-index">第{{index + 1}}题</text>
+          <text class="q-type type-{{item.type}}">{{typeLabel[item.type]}}</text>
+          <text class="q-diff diff-{{item.difficulty}}">{{diffLabel[item.difficulty]}}</text>
+          <text wx:if="{{item.isCorrect}}" class="q-result correct">✓ 正确</text>
+          <text wx:if="{{!item.isCorrect}}" class="q-result wrong">✗ 错误</text>
+        </view>
+
+        <view class="q-content">{{item.content}}</view>
+
+        <view class="q-options" wx:if="{{item.type === 'single_choice' || item.type === 'multiple_choice'}}">
+          <view class="q-option {{opt.letter === item.answer ? 'opt-correct' : (item.userAnswer && item.userAnswer.indexOf(opt.letter) >= 0 && !item.isCorrect ? 'opt-wrong' : '')}}"
+                wx:for="{{item.options}}" wx:for-item="opt" wx:key="letter">
+            <text class="opt-label">{{opt.letter}}.</text>
+            <text class="opt-text">{{opt.text}}</text>
+          </view>
+        </view>
+
+        <block>
+          <view class="q-answer-row" wx:if="{{item.type === 'fill_blank' || item.type === 'essay'}}">
+            <text class="q-label">你的答案：</text>
+            <text class="q-user-ans {{item.isCorrect ? 'ans-correct' : 'ans-wrong'}}">{{item.userAnswer || '未作答'}}</text>
+          </view>
+          <view class="q-answer-row" wx:if="{{!item.isCorrect || item.type === 'fill_blank' || item.type === 'essay'}}">
+            <text class="q-label">正确答案：</text>
+            <text class="q-correct-ans">{{item.answer}}</text>
+          </view>
+          <view class="q-explanation" wx:if="{{item.explanation}}">
+            <text class="q-label">解析：</text>
+            <text class="q-exp-text">{{item.explanation}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+  </checkbox-group>
+
+  <!-- 未提交模式：题目列表 -->
+  <view class="q-list" wx:if="{{!submitted}}">
     <view class="q-card {{item._id}}" wx:for="{{questions}}" wx:key="_id">
-      <!-- 题号 + 类型 + 难度 -->
       <view class="q-header">
         <text class="q-index">第{{index + 1}}题</text>
         <text class="q-type type-{{item.type}}">{{typeLabel[item.type]}}</text>
         <text class="q-diff diff-{{item.difficulty}}">{{diffLabel[item.difficulty]}}</text>
-        <!-- 已提交模式：正误标签 -->
-        <text wx:if="{{submitted && item.isCorrect}}" class="q-result correct">✓ 正确</text>
-        <text wx:if="{{submitted && !item.isCorrect}}" class="q-result wrong">✗ 错误</text>
       </view>
 
-      <!-- 题干 -->
       <view class="q-content">{{item.content}}</view>
 
-      <!-- 选项（单选/多选） -->
       <view class="q-options" wx:if="{{item.type === 'single_choice' || item.type === 'multiple_choice'}}">
-        <view class="q-option {{submitted ? (opt.letter === item.answer ? 'opt-correct' : (item.userAnswer && item.userAnswer.indexOf(opt.letter) >= 0 && !item.isCorrect ? 'opt-wrong' : '')) : (item.type === 'single_choice' ? (answers[item._id] === opt.letter ? 'opt-selected' : '') : (answers[item._id] && answers[item._id].indexOf(opt.letter) >= 0 ? 'opt-selected' : ''))}}" 
+        <view class="q-option {{item.type === 'single_choice' ? (answers[item._id] === opt.letter ? 'opt-selected' : '') : (answers[item._id] && answers[item._id].indexOf(opt.letter) >= 0 ? 'opt-selected' : '')}}"
               wx:for="{{item.options}}" wx:for-item="opt" wx:key="letter"
               data-qid="{{item._id}}" data-opt="{{opt.letter}}"
-              bindtap="{{submitted ? '' : (item.type === 'single_choice' ? 'onSingleChoice' : 'onMultiChoice')}}">
+              bindtap="{{item.type === 'single_choice' ? 'onSingleChoice' : 'onMultiChoice'}}">
           <text class="opt-label">{{opt.letter}}.</text>
           <text class="opt-text">{{opt.text}}</text>
         </view>
       </view>
 
-      <!-- 填空/简答输入 -->
-      <view class="q-input-area" wx:if="{{!submitted && (item.type === 'fill_blank' || item.type === 'essay')}}">
-        <textarea class="q-textarea" 
+      <view class="q-input-area" wx:if="{{item.type === 'fill_blank' || item.type === 'essay'}}">
+        <textarea class="q-textarea"
                   placeholder="{{item.type === 'essay' ? '请输入你的答案...' : '请填写答案'}}"
                   value="{{answers[item._id] || ''}}"
                   data-qid="{{item._id}}"
@@ -48,22 +90,6 @@
                   maxlength="2000"
                   auto-height />
       </view>
-
-      <!-- 已提交模式：显示学生答案 vs 正确答案 + 解析 -->
-      <block wx:if="{{submitted}}">
-        <view class="q-answer-row" wx:if="{{item.type === 'fill_blank' || item.type === 'essay'}}">
-          <text class="q-label">你的答案：</text>
-          <text class="q-user-ans {{item.isCorrect ? 'ans-correct' : 'ans-wrong'}}">{{item.userAnswer || '未作答'}}</text>
-        </view>
-        <view class="q-answer-row" wx:if="{{!item.isCorrect || item.type === 'fill_blank' || item.type === 'essay'}}">
-          <text class="q-label">正确答案：</text>
-          <text class="q-correct-ans">{{item.answer}}</text>
-        </view>
-        <view class="q-explanation" wx:if="{{item.explanation}}">
-          <text class="q-label">解析：</text>
-          <text class="q-exp-text">{{item.explanation}}</text>
-        </view>
-      </block>
     </view>
   </view>
 
@@ -72,6 +98,41 @@
     <button class="submit-btn" bindtap="onSubmit" loading="{{submitting}}" disabled="{{submitting}}">
       提交答案
     </button>
+  </view>
+
+  <!-- 收藏按钮（已提交模式） -->
+  <view class="fav-bar" wx:if="{{submitted && questions.length}}">
+    <button class="fav-btn" bindtap="onOpenFavModal">📁 收藏到组</button>
+  </view>
+
+  <!-- 收藏弹窗 -->
+  <view class="modal" wx:if="{{showFavModal}}">
+    <view class="modal-mask" bindtap="closeFavModal"></view>
+    <view class="modal-content">
+      <text class="modal-title">收藏到组</text>
+
+      <view class="fav-section">
+        <text class="fav-section-title">选择已有收藏组</text>
+        <view class="fav-group-item {{selFavGroupId===item._id?'active':''}}"
+              wx:for="{{favGroups}}" wx:key="_id"
+              bindtap="onSelectFavGroup" data-id="{{item._id}}">
+          <text>{{item.name}}</text>
+          <text class="fav-count">{{item.questionCount || 0}}题</text>
+        </view>
+        <view wx:if="{{favGroups.length===0}}" class="fav-empty-tip">暂无收藏组</view>
+      </view>
+
+      <view class="fav-section">
+        <text class="fav-section-title">或创建新收藏组</text>
+        <input class="fav-input" placeholder="输入新组名称"
+               value="{{favNewName}}" bindinput="onFavNewNameInput" maxlength="20" />
+      </view>
+
+      <view class="modal-btns">
+        <button class="btn-cancel" bindtap="closeFavModal">取消</button>
+        <button class="btn-confirm" bindtap="confirmFav">确认收藏</button>
+      </view>
+    </view>
   </view>
 
 </view>

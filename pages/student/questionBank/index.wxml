@@ -1,5 +1,75 @@
 <!-- pages/student/questionBank/index.wxml -->
-<view class="placeholder">
-  <text class="placeholder-icon">📚</text>
-  <text class="placeholder-text">题库功能开发中，敬请期待</text>
+<view class="container">
+
+  <!-- 顶栏 Tab -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab==='collection'?'active':''}}" bindtap="onTabChange" data-tab="collection">
+      收藏组
+    </view>
+    <view class="tab-item {{activeTab==='error'?'active':''}}" bindtap="onTabChange" data-tab="error">
+      错题本
+    </view>
+  </view>
+
+  <!-- 收藏组列表 -->
+  <block wx:if="{{activeTab === 'collection'}}">
+    <view wx:if="{{collectionGroups.length===0}}" class="empty">
+      <text class="empty-icon">📁</text>
+      <text class="empty-text">暂无收藏组</text>
+      <button class="btn-new" bindtap="onNewGroup">+ 新建收藏组</button>
+    </view>
+    <view class="group-list" wx:else>
+      <view class="hint-bar">💡 长按可删除</view>
+      <view class="group-item" wx:for="{{collectionGroups}}" wx:key="_id"
+            bindtap="goGroupDetail" data-id="{{item._id}}"
+            bindlongtap="onDeleteGroup" data-id="{{item._id}}" data-name="{{item.name}}" data-type="collection">
+        <view class="group-info">
+          <text class="group-name">{{item.name}}</text>
+          <text class="group-meta">{{item.questionCount || 0}}题</text>
+        </view>
+        <text class="arrow">→</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 错题本列表 -->
+  <block wx:if="{{activeTab === 'error'}}">
+    <view wx:if="{{errorFolders.length===0}}" class="empty">
+      <text class="empty-icon">📕</text>
+      <text class="empty-text">暂无错题本</text>
+      <button class="btn-new" bindtap="onNewGroup">+ 新建错题本</button>
+    </view>
+    <view class="group-list" wx:else>
+      <view class="hint-bar">💡 长按可删除</view>
+      <view class="group-item" wx:for="{{errorFolders}}" wx:key="_id"
+            bindtap="goGroupDetail" data-id="{{item._id}}"
+            bindlongtap="onDeleteGroup" data-id="{{item._id}}" data-name="{{item.name}}" data-type="error">
+        <view class="group-info">
+          <text class="group-name">{{item.name}}</text>
+          <text class="group-meta">{{item.questionCount || 0}}题</text>
+        </view>
+        <text class="arrow">→</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 新建弹窗 -->
+  <view class="modal" wx:if="{{showCreateModal}}">
+    <view class="modal-mask" bindtap="closeCreateModal"></view>
+    <view class="modal-content">
+      <text class="modal-title">新建</text>
+      <view class="type-row">
+        <view class="type-btn {{createType==='collection'?'active':''}}" bindtap="onTypeChange" data-type="collection">收藏组</view>
+        <view class="type-btn {{createType==='error'?'active':''}}" bindtap="onTypeChange" data-type="error">错题本</view>
+      </view>
+      <input class="name-input" placeholder="输入名称" value="{{createName}}" bindinput="onNameInput" maxlength="20" />
+      <view class="modal-btns">
+        <button class="btn-cancel" bindtap="closeCreateModal">取消</button>
+        <button class="btn-confirm" bindtap="confirmCreate">确认</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- FAB -->
+  <view class="fab" bindtap="onNewGroup">+</view>
 </view>

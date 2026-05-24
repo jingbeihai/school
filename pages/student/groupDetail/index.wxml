@@ -1,0 +1,77 @@
+<!-- pages/student/groupDetail/index.wxml -->
+<view class="container">
+
+  <view class="header">
+    <text class="h-name">{{group.name}}</text>
+    <text class="h-meta">{{questions.length}}道题目</text>
+  </view>
+
+  <view wx:if="{{questions.length===0}}" class="empty">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无题目</text>
+  </view>
+
+  <view wx:else>
+    <view class="select-bar">
+      <text class="select-all" bindtap="onSelectAll">{{allSelected ? '取消全选' : '全选'}}</text>
+    </view>
+    <checkbox-group bindchange="onCheckboxChange">
+      <view class="q-card" wx:for="{{questions}}" wx:key="_id">
+        <view class="q-top">
+          <checkbox value="{{item._id}}" checked="{{item.checked}}" class="q-checkbox" />
+          <text class="q-index">第{{index + 1}}题</text>
+          <text class="q-type {{item.type}}">{{typeLabel[item.type]}}</text>
+          <text class="q-diff {{item.difficulty}}">{{diffLabel[item.difficulty]}}</text>
+        </view>
+        <view class="q-content">{{item.content}}</view>
+
+        <!-- 选项 -->
+        <view class="q-options" wx:if="{{item.options && item.options.length}}">
+          <text wx:for="{{item.options}}" wx:for-item="opt" wx:key="letter" class="opt-tag">
+            {{opt.letter}}. {{opt.text}}
+          </text>
+        </view>
+
+        <!-- 填空/简答显示答案 -->
+        <view class="q-answer" wx:if="{{item.type==='fill_blank' || item.type==='essay'}}">
+          答案：{{item.answer}}
+        </view>
+        <view class="q-explanation" wx:if="{{item.explanation}}">
+          解析：{{item.explanation}}
+        </view>
+
+        <!-- 错题本额外信息 -->
+        <block wx:if="{{group.type==='error' && item.userAnswer}}">
+          <view class="error-info">
+            <text class="error-label">你的答案：</text>
+            <text class="error-user">{{item.userAnswer}}</text>
+          </view>
+        </block>
+      </view>
+    </checkbox-group>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="fix-bottom" wx:if="{{questions.length}}">
+    <button class="bottom-btn" bindtap="onMoveToGroup">📁 移动到组</button>
+    <button class="bottom-btn danger" bindtap="onRemoveFromGroup">🗑 从组中移除</button>
+  </view>
+
+  <!-- 移动弹窗 -->
+  <view class="modal" wx:if="{{showMoveModal}}">
+    <view class="modal-mask" bindtap="closeMoveModal"></view>
+    <view class="modal-content">
+      <text class="modal-title">移动到组</text>
+      <view class="group-item {{selTargetGroupId===item._id?'active':''}}"
+            wx:for="{{targetGroups}}" wx:key="_id"
+            bindtap="onSelectTargetGroup" data-id="{{item._id}}">
+        <text>{{item.name}}</text>
+        <text class="group-count">{{item.questionCount || 0}}题</text>
+      </view>
+      <view class="modal-btns">
+        <button class="btn-cancel" bindtap="closeMoveModal">取消</button>
+        <button class="btn-confirm" bindtap="confirmMove">确认移动</button>
+      </view>
+    </view>
+  </view>
+</view>

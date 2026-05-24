@@ -1,6 +1,4 @@
 {
-  "usingComponents": {},
   "navigationBarTitleText": "题库",
-  "navigationBarBackgroundColor": "#667eea",
-  "navigationBarTextStyle": "white"
+  "usingComponents": {}
 }

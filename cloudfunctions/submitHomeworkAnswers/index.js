@@ -88,6 +88,67 @@ exports.main = async (event, context) => {
 
     const result = await db.collection('submissions').add({ data: submitData })
 
+    // 自动将错题加入「默认错题本」
+    const wrongAnswers = gradedAnswers.filter(a => !a.isCorrect)
+    if (wrongAnswers.length > 0) {
+      // 查找或创建「默认错题本」（集合可能尚未创建）
+      let errorGroupRes = { data: [] }
+      try {
+        errorGroupRes = await db.collection('student_question_groups')
+          .where({ studentId: student._id, type: 'error', name: '默认错题本' })
+          .get()
+      } catch (e) {
+        // 集合不存在，data 保持为空，后续走创建逻辑
+      }
+
+      let errorGroupId
+      if (errorGroupRes.data.length === 0) {
+        const createRes = await db.collection('student_question_groups').add({
+          data: {
+            studentId: student._id,
+            name: '默认错题本',
+            type: 'error',
+            description: '',
+            createTime: new Date(),
+            updateTime: new Date()
+          }
+        })
+        errorGroupId = createRes._id
+      } else {
+        errorGroupId = errorGroupRes.data[0]._id
+      }
+
+      // 添加错题（去重）
+      for (const wrong of wrongAnswers) {
+        const question = questionMap[wrong.questionId]
+        let existTotal = 0
+        try {
+          const exist = await db.collection('student_group_questions')
+            .where({ groupId: errorGroupId, questionId: wrong.questionId })
+            .count()
+          existTotal = exist.total
+        } catch (e) {
+          // 集合不存在则直接添加
+        }
+        if (existTotal === 0) {
+          await db.collection('student_group_questions').add({
+            data: {
+              groupId: errorGroupId,
+              questionId: wrong.questionId,
+              addTime: new Date(),
+              sourceHomeworkId: homeworkId,
+              userAnswer: wrong.userAnswer || '',
+              correctAnswer: question ? question.answer : ''
+            }
+          })
+        }
+      }
+
+      await db.collection('student_question_groups').doc(errorGroupId).update({
+        data: { updateTime: new Date() }
+      })
+    }
+
     return {
       success: true,
       submission: {

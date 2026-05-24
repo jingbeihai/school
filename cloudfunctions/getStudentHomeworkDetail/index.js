@@ -72,12 +72,14 @@ exports.main = async (event) => {
         const answer = (submission.answers || []).find(a => a.questionId === q._id)
 
         return {
+          _id: q._id,
           questionId: q._id,
           type: q.type,
           content: q.content,
           options: q.options || [],
           answer: q.answer,
           explanation: q.explanation || '',
+          difficulty: q.difficulty || 'medium',
           userAnswer: answer ? answer.userAnswer : null,
           isCorrect: answer ? answer.isCorrect : false,
           comment: answer ? (answer.comment || '') : ''
