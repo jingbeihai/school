@@ -1,6 +1,34 @@
-// pages/teacher/homeworkList/index.js
 Page({
-  data: {},
+  data: {
+    list: [],
+    loading: false,
+    error: ''
+  },
 
-  onShow() {}
+  onShow() {
+    this.loadData()
+  },
+
+  loadData() {
+    this.setData({ loading: true, error: '' })
+    wx.showLoading({ title: '加载中...' })
+    wx.cloud.callFunction({ name: 'getHomeworkForReview' }).then(res => {
+      wx.hideLoading()
+      const r = res.result
+      if (r.success) {
+        this.setData({ list: r.homeworkList || [], loading: false })
+      } else {
+        this.setData({ loading: false, error: r.message || '加载失败' })
+      }
+    }).catch(err => {
+      wx.hideLoading()
+      this.setData({ loading: false, error: '网络异常，请检查网络后重试' })
+      console.error('getHomeworkForReview error:', err)
+    })
+  },
+
+  goReview(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: '/pages/teacher/reviewHomework/index?homeworkId=' + id })
+  }
 })

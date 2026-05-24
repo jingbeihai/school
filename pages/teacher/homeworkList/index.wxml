@@ -1,4 +1,36 @@
-<!-- pages/teacher/homeworkList/index.wxml -->
 <view class="container">
-  <!-- 待重新设计 -->
+  <view wx:if="{{loading && !list.length}}" class="loading">加载中...</view>
+  <block wx:elif="{{error}}">
+    <view class="empty">
+      <text class="empty-icon">⚠️</text>
+      <text class="empty-text">{{error}}</text>
+      <view class="retry-btn" bindtap="loadData">点击重试</view>
+    </view>
+  </block>
+  <block wx:elif="{{!list.length}}">
+    <view class="empty">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无发布的作业</text>
+      <text class="empty-tip">请在"题库"中发布作业</text>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="card" wx:for="{{list}}" wx:key="_id" bindtap="goReview" data-id="{{item._id}}">
+      <view class="card-top">
+        <text class="card-title">{{item.title}}</text>
+        <text class="card-arrow">〉</text>
+      </view>
+      <view class="card-info">
+        <text>班级：{{item.className || '未知'}}</text>
+        <text>发布时间：{{item.publishTime}}</text>
+        <text wx:if="{{item.deadline}}">截止：{{item.deadline}}</text>
+      </view>
+      <view class="card-progress">
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{item.totalStudents ? (item.submittedCount / item.totalStudents * 100) : 0}}%"></view>
+        </view>
+        <text class="progress-text">{{item.submittedCount}}/{{item.totalStudents}} 已提交</text>
+      </view>
+    </view>
+  </block>
 </view>

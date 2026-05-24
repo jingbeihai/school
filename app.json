@@ -9,7 +9,9 @@
     "pages/teacher/questionGroups/index",
     "pages/teacher/groupQuestions/index",
     "pages/teacher/homeworkHistory/index",
-    "pages/teacher/homeworkDetail/index"
+    "pages/teacher/homeworkDetail/index",
+    "pages/teacher/reviewHomework/index",
+    "pages/teacher/reviewStudent/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",
