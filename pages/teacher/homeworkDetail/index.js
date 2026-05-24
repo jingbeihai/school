@@ -7,7 +7,8 @@ Page({
     showClassModal: false, showGroupModal: false,
     classList: [], selClassId: '', customTitle: '',
     groupList: [], selGroupId: '',
-    typeLabel: { single_choice: '单选', multiple_choice: '多选', fill_blank: '填空', essay: '简答' }
+    typeLabel: { single_choice: '单选', multiple_choice: '多选', fill_blank: '填空', essay: '简答' },
+    diffLabel: { easy: '简单', medium: '中等', hard: '困难' }
   },
 
   onLoad(options) {

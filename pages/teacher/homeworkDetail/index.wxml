@@ -16,13 +16,18 @@
     </view>
     <checkbox-group bindchange="onCheckboxChange">
       <view class="q-card" wx:for="{{questions}}" wx:key="_id">
-        <view class="q-row">
-          <checkbox value="{{item._id}}" checked="{{item.checked}}" />
-          <view class="q-body">
-            <view class="q-type {{item.type}}">{{typeLabel[item.type]}}</view>
-            <text class="q-content">{{item.content}}</text>
-          </view>
+        <view class="q-header">
+          <checkbox value="{{item._id}}" checked="{{item.checked}}" class="q-checkbox" />
+          <text class="q-index">第{{index+1}}题</text>
+          <text class="q-type {{item.type}}">{{typeLabel[item.type]}}</text>
+          <text class="q-diff {{item.difficulty}}">{{diffLabel[item.difficulty]}}</text>
         </view>
+        <view class="q-content">{{item.content}}</view>
+        <view class="q-options" wx:if="{{item.options && item.options.length}}">
+          <text wx:for="{{item.options}}" wx:key="index" wx:for-item="opt">{{opt}}</text>
+        </view>
+        <view class="q-answer">答案：{{item.answer}}</view>
+        <view class="q-explanation" wx:if="{{item.explanation}}">解析：{{item.explanation}}</view>
       </view>
     </checkbox-group>
   </view>
