@@ -43,13 +43,13 @@ App({
   navigateByRole(role) {
     const pagePaths = {
       'teacher': '/pages/teacher/homeworkList/index',
-      'student': '/pages/student/home/index',
+      'student': '/pages/student/homework/index',
       'parent': '/pages/parent/home/index'
     }
 
     const path = pagePaths[role]
     if (path) {
-      if (role === 'teacher') {
+      if (role === 'teacher' || role === 'student') {
         wx.switchTab({ url: path })
       } else {
         wx.redirectTo({ url: path })

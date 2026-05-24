@@ -1,0 +1,4 @@
+<!-- pages/student/classDetail/index.wxml -->
+<view class="container">
+  <text class="placeholder">班级详情开发中</text>
+</view>

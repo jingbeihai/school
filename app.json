@@ -11,7 +11,11 @@
     "pages/teacher/homeworkHistory/index",
     "pages/teacher/homeworkDetail/index",
     "pages/teacher/reviewHomework/index",
-    "pages/teacher/reviewStudent/index"
+    "pages/teacher/reviewStudent/index",
+    "pages/student/profile/index",
+    "pages/student/homework/index",
+    "pages/student/questionBank/index",
+    "pages/student/classDetail/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",
@@ -20,6 +24,7 @@
     "backgroundColor": "#f5f5f5"
   },
   "tabBar": {
+    "custom": true,
     "color": "#999999",
     "selectedColor": "#667eea",
     "backgroundColor": "#ffffff",
@@ -35,6 +40,18 @@
       },
       {
         "pagePath": "pages/teacher/profile/index",
+        "text": "我的"
+      },
+      {
+        "pagePath": "pages/student/homework/index",
+        "text": "作业"
+      },
+      {
+        "pagePath": "pages/student/questionBank/index",
+        "text": "题库"
+      },
+      {
+        "pagePath": "pages/student/profile/index",
         "text": "我的"
       }
     ]

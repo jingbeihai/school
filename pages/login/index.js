@@ -87,14 +87,14 @@ Page({
   navigateByRole(role) {
     const pagePaths = {
       'teacher': '/pages/teacher/homeworkList/index',
-      'student': '/pages/student/home/index',
+      'student': '/pages/student/homework/index',
       'parent': '/pages/parent/home/index'
     }
 
     const path = pagePaths[role]
     if (path) {
-      // tabBar 页面必须用 switchTab
-      if (role === 'teacher') {
+      // teacher 和 student 都有 tabBar，必须用 switchTab
+      if (role === 'teacher' || role === 'student') {
         wx.switchTab({ url: path })
       } else {
         wx.redirectTo({ url: path })

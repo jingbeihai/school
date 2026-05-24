@@ -1,0 +1,5 @@
+<!-- pages/student/homework/index.wxml -->
+<view class="placeholder">
+  <text class="placeholder-icon">📝</text>
+  <text class="placeholder-text">作业功能开发中，敬请期待</text>
+</view>

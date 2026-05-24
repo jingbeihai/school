@@ -1,7 +1,6 @@
-// pages/teacher/profile/index.js
+// pages/student/profile/index.js
 const app = getApp()
 
-// 班级卡片预设渐变色（固定不变）
 const CARD_GRADIENTS = [
   ['#667eea', '#764ba2'],
   ['#f093fb', '#f5576c'],
@@ -17,19 +16,19 @@ Page({
   data: {
     userInfo: {},
     classList: [],
-    showCreateModal: false,
+    showJoinModal: false,
     showEditModal: false,
-    newClassName: '',
-    newInviteCode: '',
-    creating: false,
+    inviteCode: '',
+    joining: false,
     editNickName: '',
     editPhone: '',
     editAvatarUrl: '',
-    editAvatarPath: '',  // 本地临时路径，用于上传
+    editAvatarPath: '',
     saving: false
   },
 
   onShow() {
+    // 每次显示时更新 tab bar
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().updateTabs()
     }
@@ -40,15 +39,13 @@ Page({
     const cached = app.globalData.userInfo || {}
     this.setData({ userInfo: cached })
     this.fetchClassList()
-    // 如果缓存中没有头像，从后端刷新一次用户信息
     if (!cached.avatarUrl) {
       this.syncUserInfo()
     }
   },
 
-  // 从后端同步最新用户信息
   syncUserInfo() {
-    const role = wx.getStorageSync('role') || 'teacher'
+    const role = wx.getStorageSync('role') || 'student'
     wx.cloud.callFunction({
       name: 'login',
       data: { role, nickName: '', avatarUrl: '' }
@@ -64,11 +61,9 @@ Page({
     }).catch(() => {})
   },
 
-  // 获取班级列表
   fetchClassList() {
-    wx.cloud.callFunction({ name: 'getClassList' }).then(res => {
+    wx.cloud.callFunction({ name: 'getStudentClasses' }).then(res => {
       if (res.result.success) {
-        // 为每个班级分配固定渐变色
         const list = (res.result.list || []).map((item, i) => {
           const colors = CARD_GRADIENTS[i % CARD_GRADIENTS.length]
           return { ...item, bgColor: colors[0], bgColor2: colors[1] }
@@ -95,40 +90,37 @@ Page({
     })
   },
 
-  // 新建班级弹窗
-  onCreateClass() {
-    this.setData({ showCreateModal: true, newClassName: '', newInviteCode: '' })
+  // 加入班级弹窗
+  onJoinClass() {
+    this.setData({ showJoinModal: true, inviteCode: '' })
   },
-  onCloseCreateModal() {
-    this.setData({ showCreateModal: false })
-  },
-  onClassNameInput(e) {
-    this.setData({ newClassName: e.detail.value })
+  onCloseJoinModal() {
+    this.setData({ showJoinModal: false })
   },
   onInviteCodeInput(e) {
-    this.setData({ newInviteCode: e.detail.value })
+    this.setData({ inviteCode: e.detail.value })
   },
-  onConfirmCreate() {
-    const { newClassName, newInviteCode } = this.data
-    if (!newClassName.trim()) {
-      wx.showToast({ title: '请输入班级名称', icon: 'none' })
+  onConfirmJoin() {
+    const { inviteCode } = this.data
+    if (!inviteCode.trim()) {
+      wx.showToast({ title: '请输入邀请码', icon: 'none' })
       return
     }
-    this.setData({ creating: true })
+    this.setData({ joining: true })
     wx.cloud.callFunction({
-      name: 'createClass',
-      data: { name: newClassName.trim(), inviteCode: newInviteCode.trim() || undefined }
+      name: 'joinClass',
+      data: { inviteCode: inviteCode.trim() }
     }).then(res => {
-      this.setData({ creating: false })
+      this.setData({ joining: false })
       if (res.result.success) {
-        wx.showToast({ title: '创建成功', icon: 'success' })
-        this.setData({ showCreateModal: false })
+        wx.showToast({ title: '加入成功', icon: 'success' })
+        this.setData({ showJoinModal: false })
         this.fetchClassList()
       } else {
         wx.showToast({ title: res.result.message, icon: 'none' })
       }
     }).catch(() => {
-      this.setData({ creating: false })
+      this.setData({ joining: false })
       wx.showToast({ title: '网络错误', icon: 'none' })
     })
   },
@@ -153,12 +145,10 @@ Page({
   onEditPhoneInput(e) {
     this.setData({ editPhone: e.detail.value })
   },
-  // 选择头像
   onChooseAvatar(e) {
     const { avatarUrl } = e.detail
     this.setData({ editAvatarUrl: avatarUrl, editAvatarPath: avatarUrl })
   },
-  // 上传头像到云存储并获取 fileID
   async uploadAvatar(tempPath) {
     const cloudPath = 'avatars/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.png'
     try {
@@ -175,7 +165,6 @@ Page({
 
     try {
       let avatarUrl = ''
-      // 如果用户选择了新头像，先上传到云存储
       if (editAvatarPath) {
         wx.showLoading({ title: '上传头像...' })
         avatarUrl = await this.uploadAvatar(editAvatarPath)
@@ -212,6 +201,6 @@ Page({
   // 打开班级详情
   onOpenClass(e) {
     const id = e.currentTarget.dataset.id
-    wx.navigateTo({ url: '/pages/teacher/classDetail/index?classId=' + id })
+    wx.navigateTo({ url: '/pages/student/classDetail/index?classId=' + id })
   }
 })

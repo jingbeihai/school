@@ -1,0 +1,12 @@
+/* pages/student/homework/index.wxss */
+page { background: #f5f5f5; }
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding-bottom: 200rpx;
+}
+.placeholder-icon { font-size: 100rpx; margin-bottom: 30rpx; }
+.placeholder-text { font-size: 28rpx; color: #999; }
