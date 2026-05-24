@@ -22,6 +22,7 @@ Page({
     showCollectModal: false,
     classList: [],
     selClassId: '',
+    customTitle: '',
     groupList: [],
     selGroupId: '',
     publishing: false,
@@ -213,8 +214,10 @@ Page({
 
   onSelectClass(e) { this.setData({ selClassId: e.currentTarget.dataset.id }) },
 
+  onCustomTitle(e) { this.setData({ customTitle: e.detail.value }) },
+
   onConfirmPublish() {
-    const { selClassId, questions, publishing } = this.data
+    const { selClassId, questions, publishing, customTitle } = this.data
     if (publishing) return
     if (!selClassId) return wx.showToast({ title: '请选择班级', icon: 'none' })
 
@@ -222,7 +225,7 @@ Page({
     this.setData({ publishing: true })
     wx.cloud.callFunction({
       name: 'publishHomework',
-      data: { classId: selClassId, questionIds: qIds }
+      data: { classId: selClassId, questionIds: qIds, title: customTitle.trim() || undefined }
     }).then(res => {
       const r = res.result
       if (r.success) {

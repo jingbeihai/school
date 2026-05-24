@@ -37,6 +37,7 @@
     <view class="modal-mask" bindtap="closeModal"></view>
     <view class="modal-content">
       <text class="modal-title">选择班级</text>
+      <input class="title-input" placeholder="自定义标题（可选，如：期中复习测验）" value="{{customTitle}}" bindinput="onCustomTitle" maxlength="50" />
       <view class="class-item {{selClassId===item._id?'active':''}}" wx:for="{{classList}}" wx:key="_id" bindtap="onSelectClass" data-id="{{item._id}}">{{item.name}}</view>
       <view class="modal-btns">
         <button class="btn-cancel" bindtap="closeModal">取消</button>

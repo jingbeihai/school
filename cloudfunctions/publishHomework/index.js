@@ -3,7 +3,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
 exports.main = async (event) => {
-  const { classId, questionIds, deadline } = event
+  const { classId, questionIds, deadline, title: customTitle } = event
   const wxContext = cloud.getWXContext()
   const openId = wxContext.OPENID
   if (!openId) return { success: false, message: '未获取到用户身份' }
@@ -22,8 +22,7 @@ exports.main = async (event) => {
     const className = classRes.data[0].name
     const now = new Date()
     const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
-    const title = `${dateStr} ${timeStr} ${className}`
+    const title = `${dateStr} ${className}` + (customTitle && customTitle.trim() ? ` ${customTitle.trim()}` : '')
 
     // 计算截止时间（默认7天后）
     let dl = deadline ? new Date(deadline) : new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)

@@ -3,7 +3,7 @@ Page({
   data: {
     homeworkId: '', homework: null, questions: [], allSelected: false,
     showClassModal: false, showGroupModal: false,
-    classList: [], selClassId: '',
+    classList: [], selClassId: '', customTitle: '',
     groupList: [], selGroupId: '',
     typeLabel: { single_choice: '单选', multiple_choice: '多选', fill_blank: '填空', essay: '简答' }
   },
@@ -52,13 +52,15 @@ Page({
 
   onSelectClass(e) { this.setData({ selClassId: e.currentTarget.dataset.id }) },
 
+  onCustomTitle(e) { this.setData({ customTitle: e.detail.value }) },
+
   onConfirmRepublish() {
-    const { selClassId } = this.data
+    const { selClassId, customTitle } = this.data
     if (!selClassId) return wx.showToast({ title: '请选择班级', icon: 'none' })
     const ids = this.getSelectedIds()
     wx.cloud.callFunction({
       name: 'reuseQuestions',
-      data: { sourceType: 'homework', sourceId: this.data.homeworkId, targetType: 'homework', questionIds: ids, classId: selClassId }
+      data: { sourceType: 'homework', sourceId: this.data.homeworkId, targetType: 'homework', questionIds: ids, classId: selClassId, title: customTitle.trim() || undefined }
     }).then(res => {
       if (res.result.success) {
         wx.showToast({ title: '发布成功', icon: 'success' })
