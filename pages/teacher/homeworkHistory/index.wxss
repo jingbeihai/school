@@ -5,8 +5,13 @@
 .empty-text { font-size: 28rpx; color: #999; }
 
 .hw-item { display: flex; align-items: center; background: #fff; border-radius: 16rpx; padding: 30rpx; margin-bottom: 16rpx; box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06); }
+.hw-item.withdrawn { opacity: 0.55; }
 .hw-info { flex: 1; }
 .hw-title { font-size: 30rpx; color: #333; font-weight: bold; display: block; margin-bottom: 8rpx; }
+.withdrawn-tag {
+  display: inline-block; font-size: 20rpx; color: #fff; background: #999;
+  padding: 2rpx 10rpx; border-radius: 6rpx; margin-left: 12rpx; vertical-align: middle; font-weight: normal;
+}
 .hw-class { font-size: 24rpx; color: #667eea; display: block; margin-bottom: 4rpx; }
 .hw-meta { font-size: 22rpx; color: #999; display: block; }
 .hw-deadline { font-size: 22rpx; color: #e74c3c; display: block; }

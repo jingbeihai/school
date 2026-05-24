@@ -18,7 +18,7 @@ exports.main = async () => {
 
     // 查询教师发布的所有作业（不用 orderBy 避免依赖复合索引）
     const hwRes = await db.collection('homework')
-      .where({ teacherId })
+      .where({ teacherId, status: 'active' })
       .get()
     console.log('homework count:', hwRes.data.length)
 
