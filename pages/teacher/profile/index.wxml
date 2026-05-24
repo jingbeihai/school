@@ -32,7 +32,7 @@
 
     <!-- 已有班级卡片 -->
     <view class="class-card" wx:for="{{classList}}" wx:key="_id" bindtap="onOpenClass" data-id="{{item._id}}">
-      <image class="card-bg" src="https://picsum.photos/200/150?random={{index}}" mode="aspectFill"></image>
+      <view class="card-bg" style="background: linear-gradient(135deg, {{item.bgColor || '#667eea'}} 0%, {{item.bgColor2 || '#764ba2'}} 100%);"></view>
       <view class="card-overlay">
         <text class="card-name">{{item.name}}</text>
         <text class="card-count">{{item.studentCount || 0}}名学生</text>
@@ -58,6 +58,10 @@
 <view class="modal-mask" wx:if="{{showEditModal}}" bindtap="onCloseEditModal"></view>
 <view class="modal-dialog" wx:if="{{showEditModal}}">
   <text class="modal-title">修改信息</text>
+  <view class="edit-avatar-wrap">
+    <image class="edit-avatar" src="{{editAvatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+    <button class="edit-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">更换头像</button>
+  </view>
   <input class="modal-input" placeholder="昵称" value="{{editNickName}}" bindinput="onEditNickNameInput"/>
   <input class="modal-input" type="number" maxlength="11" placeholder="手机号" value="{{editPhone}}" bindinput="onEditPhoneInput"/>
   <view class="modal-btns">

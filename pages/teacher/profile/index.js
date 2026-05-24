@@ -1,6 +1,18 @@
 // pages/teacher/profile/index.js
 const app = getApp()
 
+// 班级卡片预设渐变色（固定不变）
+const CARD_GRADIENTS = [
+  ['#667eea', '#764ba2'],
+  ['#f093fb', '#f5576c'],
+  ['#4facfe', '#00f2fe'],
+  ['#43e97b', '#38f9d7'],
+  ['#fa709a', '#fee140'],
+  ['#a18cd1', '#fbc2eb'],
+  ['#fccb90', '#d57eeb'],
+  ['#e0c3fc', '#8ec5fc'],
+]
+
 Page({
   data: {
     userInfo: {},
@@ -12,6 +24,8 @@ Page({
     creating: false,
     editNickName: '',
     editPhone: '',
+    editAvatarUrl: '',
+    editAvatarPath: '',  // 本地临时路径，用于上传
     saving: false
   },
 
@@ -20,15 +34,43 @@ Page({
   },
 
   loadData() {
-    this.setData({ userInfo: app.globalData.userInfo || {} })
+    const cached = app.globalData.userInfo || {}
+    this.setData({ userInfo: cached })
     this.fetchClassList()
+    // 如果缓存中没有头像，从后端刷新一次用户信息
+    if (!cached.avatarUrl) {
+      this.syncUserInfo()
+    }
+  },
+
+  // 从后端同步最新用户信息
+  syncUserInfo() {
+    const role = wx.getStorageSync('role') || 'teacher'
+    wx.cloud.callFunction({
+      name: 'login',
+      data: { role, nickName: '', avatarUrl: '' }
+    }).then(res => {
+      if (res.result.success) {
+        const ui = res.result.userInfo
+        wx.setStorageSync('userInfo', ui)
+        wx.setStorageSync('role', ui.role)
+        app.globalData.userInfo = ui
+        app.globalData.role = ui.role
+        this.setData({ userInfo: ui })
+      }
+    }).catch(() => {})
   },
 
   // 获取班级列表
   fetchClassList() {
     wx.cloud.callFunction({ name: 'getClassList' }).then(res => {
       if (res.result.success) {
-        this.setData({ classList: res.result.list })
+        // 为每个班级分配固定渐变色
+        const list = (res.result.list || []).map((item, i) => {
+          const colors = CARD_GRADIENTS[i % CARD_GRADIENTS.length]
+          return { ...item, bgColor: colors[0], bgColor2: colors[1] }
+        })
+        this.setData({ classList: list })
       }
     }).catch(err => console.error(err))
   },
@@ -93,6 +135,8 @@ Page({
     const { userInfo } = this.data
     this.setData({
       showEditModal: true,
+      editAvatarUrl: userInfo.avatarUrl || '',
+      editAvatarPath: '',
       editNickName: userInfo.nickName || '',
       editPhone: userInfo.phone || ''
     })
@@ -106,13 +150,45 @@ Page({
   onEditPhoneInput(e) {
     this.setData({ editPhone: e.detail.value })
   },
-  onConfirmEdit() {
-    const { editNickName, editPhone } = this.data
+  // 选择头像
+  onChooseAvatar(e) {
+    const { avatarUrl } = e.detail
+    this.setData({ editAvatarUrl: avatarUrl, editAvatarPath: avatarUrl })
+  },
+  // 上传头像到云存储并获取 fileID
+  async uploadAvatar(tempPath) {
+    const cloudPath = 'avatars/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.png'
+    try {
+      const res = await wx.cloud.uploadFile({ cloudPath, filePath: tempPath })
+      return res.fileID
+    } catch (err) {
+      console.error('上传头像失败:', err)
+      return ''
+    }
+  },
+  async onConfirmEdit() {
+    const { editNickName, editPhone, editAvatarPath, userInfo } = this.data
     this.setData({ saving: true })
-    wx.cloud.callFunction({
-      name: 'updateUserProfile',
-      data: { nickName: editNickName.trim(), phone: editPhone.trim() }
-    }).then(res => {
+
+    try {
+      let avatarUrl = ''
+      // 如果用户选择了新头像，先上传到云存储
+      if (editAvatarPath) {
+        wx.showLoading({ title: '上传头像...' })
+        avatarUrl = await this.uploadAvatar(editAvatarPath)
+        wx.hideLoading()
+        if (!avatarUrl) {
+          this.setData({ saving: false })
+          wx.showToast({ title: '头像上传失败', icon: 'none' })
+          return
+        }
+      }
+
+      const res = await wx.cloud.callFunction({
+        name: 'updateUserProfile',
+        data: { role: userInfo.role, nickName: editNickName.trim(), phone: editPhone.trim(), avatarUrl: avatarUrl || undefined }
+      })
+
       this.setData({ saving: false })
       if (res.result.success) {
         wx.showToast({ title: '保存成功', icon: 'success' })
@@ -123,10 +199,11 @@ Page({
       } else {
         wx.showToast({ title: res.result.message, icon: 'none' })
       }
-    }).catch(() => {
+    } catch (err) {
       this.setData({ saving: false })
+      wx.hideLoading()
       wx.showToast({ title: '网络错误', icon: 'none' })
-    })
+    }
   },
 
   // 打开班级详情

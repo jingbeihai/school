@@ -28,18 +28,8 @@ Page({
 
     this.setData({ isLoading: true })
 
-    // 调用 wx.getUserProfile 获取头像和昵称
-    wx.getUserProfile({
-      desc: '用于完善个人资料',
-      success: (profileRes) => {
-        const { nickName, avatarUrl } = profileRes.userInfo
-        this.doLogin(selectedRole, nickName, avatarUrl)
-      },
-      fail: () => {
-        // 用户拒绝授权，依然可以登录（昵称和头像为空）
-        this.doLogin(selectedRole, '', '')
-      }
-    })
+    // 微信已废弃 getUserProfile，直接登录（老用户不会覆盖已有昵称）
+    this.doLogin(selectedRole, '', '')
   },
 
   // 执行登录

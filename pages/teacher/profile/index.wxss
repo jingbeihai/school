@@ -105,6 +105,7 @@
 .card-bg {
   width: 100%;
   height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .card-overlay {
@@ -189,6 +190,32 @@
   font-size: 28rpx;
   margin-bottom: 20rpx;
   box-sizing: border-box;
+}
+
+/* 编辑头像 */
+.edit-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+.edit-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  background: #eee;
+  margin-bottom: 16rpx;
+}
+.edit-avatar-btn {
+  font-size: 24rpx;
+  color: #667eea;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 1.4;
+}
+.edit-avatar-btn::after {
+  border: none;
 }
 
 .modal-btns {

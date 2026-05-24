@@ -52,6 +52,9 @@ exports.main = async (event, context) => {
     if (res.data && res.data.length > 0) {
       // ===== 老用户 =====
       let record = res.data[0]
+      console.log('=== login 老用户 ===')
+      console.log('received nickName:', nickName, 'avatarUrl:', avatarUrl)
+      console.log('DB nickName:', record.nickName, 'avatarUrl:', record.avatarUrl)
       const updateData = {}
 
       // VIP 过期检查
@@ -97,10 +100,11 @@ exports.main = async (event, context) => {
       const vipExpireDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
       const userCode = await generateUniqueSixDigitCode()
 
+      const roleNames = { teacher: '教师', student: '学生', parent: '家长' }
       const newUser = {
         openId: openId,
         role: role,
-        nickName: nickName || '',
+        nickName: nickName || (roleNames[role] || '用户') + userCode,
         phone: '',
         avatarUrl: avatarUrl || '',
         isVip: true,
