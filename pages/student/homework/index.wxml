@@ -1,5 +1,42 @@
 <!-- pages/student/homework/index.wxml -->
-<view class="placeholder">
-  <text class="placeholder-icon">📝</text>
-  <text class="placeholder-text">作业功能开发中，敬请期待</text>
+<view class="container">
+
+  <view class="hint-bar" wx:if="{{list.length > 0}}">
+    <text>📋 共 {{list.length}} 项作业</text>
+  </view>
+
+  <!-- 作业列表 -->
+  <view class="hw-list" wx:if="{{list.length > 0}}">
+    <view class="hw-card {{item.submitted ? 'done' : ''}}" 
+          wx:for="{{list}}" wx:key="_id" 
+          bindtap="goHomework" 
+          data-id="{{item._id}}" 
+          data-submitted="{{item.submitted}}">
+      <view class="hw-title">{{item.title}}</view>
+      <view class="hw-meta">
+        <text class="hw-class">🏫 {{item.className}}</text>
+        <text class="hw-deadline">⏰ 截止 {{item.deadline}}</text>
+      </view>
+      <view class="hw-footer">
+        <text class="hw-time">发布于 {{item.publishTime}}</text>
+        <view class="hw-status {{item.submitted ? 'submitted' : 'pending'}}">
+          <text wx:if="{{item.submitted}}">✅ {{item.correctCount}}/{{item.totalCount}} 正确</text>
+          <text wx:else>📝 未提交</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!loading && list.length === 0}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无作业</text>
+    <text class="empty-sub">加入班级后，老师发布的作业会显示在这里</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
 </view>

@@ -11,14 +11,27 @@ exports.main = async (event) => {
   if (!openId) return { success: false, message: '未获取到用户身份' }
 
   try {
-    const userRes = await db.collection('users').where({ openId, role: 'teacher' }).get()
-    if (userRes.data.length === 0) return { success: false, message: '无权限，仅教师可操作' }
-    const teacherId = userRes.data[0]._id
+    const userRes = await db.collection('users').where({ openId }).get()
+    if (userRes.data.length === 0) return { success: false, message: '用户不存在' }
+    const user = userRes.data[0]
 
     // 查询作业
     const hwRes = await db.collection('homework').doc(homeworkId).get()
     if (!hwRes.data) return { success: false, message: '作业不存在' }
-    if (hwRes.data.teacherId !== teacherId) return { success: false, message: '无权查看此作业' }
+
+    // 权限校验：教师只能看自己的作业，学生只能看自己的提交
+    if (user.role === 'teacher') {
+      if (hwRes.data.teacherId !== user._id) {
+        return { success: false, message: '无权查看此作业' }
+      }
+    } else if (user.role === 'student') {
+      // 学生只能查看自己的提交
+      if (studentId !== user._id) {
+        return { success: false, message: '无权查看他人的提交' }
+      }
+    } else {
+      return { success: false, message: '角色无权限' }
+    }
 
     // 查询提交记录
     const subRes = await db.collection('submissions')

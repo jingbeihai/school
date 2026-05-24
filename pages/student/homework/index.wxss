@@ -1,12 +1,105 @@
 /* pages/student/homework/index.wxss */
-page { background: #f5f5f5; }
-.placeholder {
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 140rpx;
+}
+
+.hint-bar {
+  padding: 20rpx 30rpx;
+  font-size: 24rpx;
+  color: #999;
+  background: #f5f5f5;
+}
+
+/* 作业卡片 */
+.hw-list {
+  padding: 0 30rpx;
+}
+
+.hw-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.hw-card.done {
+  opacity: 0.75;
+}
+
+.hw-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 14rpx;
+}
+
+.hw-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: #888;
+  margin-bottom: 14rpx;
+}
+
+.hw-class {
+  color: #667eea;
+}
+
+.hw-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hw-time {
+  font-size: 22rpx;
+  color: #bbb;
+}
+
+.hw-status {
+  font-size: 24rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.hw-status.submitted {
+  background: #e8f5e9;
+  color: #27ae60;
+}
+
+.hw-status.pending {
+  background: #fff3e0;
+  color: #f39c12;
+}
+
+/* 空状态 */
+.empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
-  padding-bottom: 200rpx;
+  padding-top: 200rpx;
 }
-.placeholder-icon { font-size: 100rpx; margin-bottom: 30rpx; }
-.placeholder-text { font-size: 28rpx; color: #999; }
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 30rpx;
+}
+.empty-text {
+  font-size: 30rpx;
+  color: #999;
+  margin-bottom: 12rpx;
+}
+.empty-sub {
+  font-size: 24rpx;
+  color: #ccc;
+}
+
+.loading {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+  font-size: 26rpx;
+}

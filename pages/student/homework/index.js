@@ -1,9 +1,40 @@
 // pages/student/homework/index.js
+const { formatDate } = require('../../../utils/util.js')
+
 Page({
-  data: {},
+  data: {
+    list: [],
+    loading: false
+  },
+
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().updateTabs()
     }
+    this.loadData()
+  },
+
+  loadData() {
+    this.setData({ loading: true })
+    wx.cloud.callFunction({ name: 'getStudentHomeworkList' }).then(res => {
+      this.setData({ loading: false })
+      if (res.result.success) {
+        const list = (res.result.list || []).map(item => ({
+          ...item,
+          publishTime: formatDate(item.publishTime),
+          deadline: formatDate(item.deadline)
+        }))
+        this.setData({ list })
+      }
+    }).catch(() => {
+      this.setData({ loading: false })
+    })
+  },
+
+  // 进入作业
+  goHomework(e) {
+    const id = e.currentTarget.dataset.id
+    const submitted = e.currentTarget.dataset.submitted
+    wx.navigateTo({ url: '/pages/student/homeworkDetail/index?homeworkId=' + id + '&submitted=' + (submitted ? '1' : '0') })
   }
 })

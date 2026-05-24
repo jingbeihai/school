@@ -14,6 +14,7 @@
     "pages/teacher/reviewStudent/index",
     "pages/student/profile/index",
     "pages/student/homework/index",
+    "pages/student/homeworkDetail/index",
     "pages/student/questionBank/index",
     "pages/student/classDetail/index"
   ],
