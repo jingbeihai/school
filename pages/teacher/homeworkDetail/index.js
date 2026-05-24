@@ -44,7 +44,7 @@ Page({
     const ids = this.getSelectedIds()
     if (!ids.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
     wx.cloud.callFunction({ name: 'getClassList' }).then(res => {
-      const list = res.result?.classes || []
+      const list = res.result?.list || []
       if (!list.length) return wx.showToast({ title: '请先创建班级', icon: 'none' })
       this.setData({ showClassModal: true, classList: list, selClassId: '' })
     })

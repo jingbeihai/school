@@ -205,7 +205,7 @@ Page({
 
     // 加载班级列表
     wx.cloud.callFunction({ name: 'getClassList' }).then(res => {
-      const list = res.result?.classes || []
+      const list = res.result?.list || []
       if (!list.length) return wx.showToast({ title: '请先创建班级', icon: 'none' })
       this.setData({ showPublishModal: true, classList: list, selClassId: '' })
     })

@@ -15,33 +15,24 @@ exports.main = async (event) => {
   if (!fileID) return { success: false, message: '请提供图片文件ID' }
 
   try {
-    // 下载云存储文件
-    const downloadRes = await cloud.downloadFile({ fileID })
-    const fileBuffer = downloadRes.fileContent
-
-    // 使用微信云开发内置的 OCR
-    // 调用腾讯云 OCR 通用印刷体识别
+    // 调用微信云开发内置 OCR 通用印刷体识别
     const res = await cloud.openapi.ocr.printedText({
       type: 'photo',
       imgUrl: fileID
-    }).catch(async () => {
-      // 如果 openapi 不可用，返回 mock 数据提示需手动配置
-      return null
     })
 
-    if (res && res.items) {
+    if (res && res.items && res.items.length > 0) {
       const text = res.items.map(item => item.text).join('\n')
       return { success: true, text }
     }
 
-    // 备选：返回提示信息
-    return {
-      success: true,
-      text: 'OCR识别功能需要配置腾讯云OCR服务。\n请确保已在云开发控制台开通OCR接口权限。\n当前为占位文本，请手动输入或通过AI出题。',
-      needManual: true
-    }
+    return { success: false, message: '图片中未识别到文字，请确保图片清晰' }
   } catch (err) {
     console.error('ocrImage error:', err)
+    const errCode = err.errCode || err.code || ''
+    if (errCode === -604011) {
+      return { success: false, message: 'OCR接口未开通，请在微信云开发控制台 → 云函数 → ocrImage → 开通OCR权限' }
+    }
     return { success: false, message: '图片识别失败：' + (err.message || '未知错误') }
   }
 }

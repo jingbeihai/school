@@ -1,20 +1,4 @@
 <!-- pages/teacher/homeworkList/index.wxml -->
 <view class="container">
-  <view wx:if="{{list.length===0}}" class="empty">
-    <text class="empty-icon">📚</text>
-    <text class="empty-text">暂无作业</text>
-    <button class="btn-go" bindtap="goPublish">去发布作业</button>
-  </view>
-
-  <view class="hw-list" wx:else>
-    <view class="hw-item" wx:for="{{list}}" wx:key="_id" bindtap="goDetail" data-id="{{item._id}}">
-      <view class="hw-info">
-        <text class="hw-title">{{item.title}}</text>
-        <text class="hw-class">班级：{{item.className || '未知'}}</text>
-        <text class="hw-meta">{{item.questionCount}}题 · {{item.publishTime}}</text>
-        <text class="hw-status {{item.status}}">{{item.status==='active'?'进行中':'已归档'}}</text>
-      </view>
-      <text class="arrow">→</text>
-    </view>
-  </view>
+  <!-- 待重新设计 -->
 </view>

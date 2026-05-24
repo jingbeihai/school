@@ -25,11 +25,11 @@
     "list": [
       {
         "pagePath": "pages/teacher/homeworkList/index",
-        "text": "作业"
+        "text": "批阅"
       },
       {
         "pagePath": "pages/teacher/publishHomework/index",
-        "text": "发布"
+        "text": "题库"
       },
       {
         "pagePath": "pages/teacher/profile/index",

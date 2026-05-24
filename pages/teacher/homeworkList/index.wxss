@@ -1,15 +1,2 @@
 /* pages/teacher/homeworkList/index.wxss */
 .container { min-height: 100vh; background: #f5f5f5; padding: 20rpx; }
-.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; }
-.empty-icon { font-size: 100rpx; margin-bottom: 30rpx; }
-.empty-text { font-size: 28rpx; color: #999; margin-bottom: 40rpx; }
-.btn-go { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border-radius: 40rpx; font-size: 28rpx; border: none; padding: 16rpx 60rpx; }
-
-.hw-item { display: flex; align-items: center; background: #fff; border-radius: 16rpx; padding: 30rpx; margin-bottom: 16rpx; box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06); }
-.hw-info { flex: 1; }
-.hw-title { font-size: 30rpx; color: #333; font-weight: bold; display: block; margin-bottom: 8rpx; }
-.hw-class { font-size: 24rpx; color: #667eea; display: block; margin-bottom: 4rpx; }
-.hw-meta { font-size: 22rpx; color: #999; display: block; }
-.hw-status { font-size: 22rpx; color: #27ae60; display: block; }
-.hw-status.archived { color: #999; }
-.arrow { font-size: 36rpx; color: #ccc; }
