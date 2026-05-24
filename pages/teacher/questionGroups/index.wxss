@@ -5,6 +5,9 @@
 .empty-text { font-size: 28rpx; color: #999; margin-bottom: 40rpx; }
 .btn-new { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border-radius: 40rpx; font-size: 28rpx; border: none; padding: 16rpx 60rpx; }
 
+.hint-bar {
+  font-size: 22rpx; color: #999; text-align: center; padding: 12rpx 0; margin-bottom: 8rpx;
+}
 .group-item {
   display: flex; align-items: center; background: #fff; border-radius: 16rpx;
   padding: 30rpx; margin-bottom: 16rpx; box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);

@@ -7,6 +7,7 @@
   </view>
 
   <view class="group-list" wx:else>
+    <view class="hint-bar">💡 长按收藏组可删除</view>
     <view class="group-item" wx:for="{{groups}}" wx:key="_id" bindtap="goGroupDetail" data-id="{{item._id}}" bindlongtap="onDeleteGroup" data-index="{{index}}">
       <view class="group-info">
         <text class="group-name">{{item.name}}</text>

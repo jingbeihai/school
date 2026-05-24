@@ -6,6 +6,7 @@
   </view>
 
   <view class="hw-list" wx:else>
+    <view class="hint-bar">💡 长按作业可撤回或删除</view>
     <view class="hw-item {{item.status==='withdrawn'?'withdrawn':''}}" wx:for="{{list}}" wx:key="_id" bindtap="goDetail" data-id="{{item._id}}" bindlongtap="onLongPress" data-id="{{item._id}}" data-title="{{item.title}}" data-status="{{item.status}}">
       <view class="hw-info">
         <text class="hw-title">{{item.title}}<text class="withdrawn-tag" wx:if="{{item.status==='withdrawn'}}">已撤回</text></text>
