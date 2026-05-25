@@ -1,0 +1,91 @@
+/* pages/parent/homework/index.wxss */
+
+page { background: #f5f5f5; }
+
+.container {
+  min-height: 100vh;
+  padding-bottom: 140rpx;
+}
+
+.hint-bar {
+  padding: 20rpx 30rpx 10rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 作业列表 */
+.hw-list {
+  padding: 0 30rpx;
+}
+
+.hw-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.06);
+}
+
+.hw-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 14rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hw-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14rpx;
+}
+
+.hw-class, .hw-deadline {
+  font-size: 24rpx;
+  color: #888;
+}
+
+.hw-footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.hw-time, .hw-total {
+  font-size: 22rpx;
+  color: #aaa;
+}
+
+/* 空状态 */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 200rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #999;
+  margin-top: 20rpx;
+}
+
+.empty-sub {
+  font-size: 24rpx;
+  color: #bbb;
+  margin-top: 12rpx;
+}
+
+.loading {
+  text-align: center;
+  padding: 60rpx 0;
+  font-size: 28rpx;
+  color: #999;
+}

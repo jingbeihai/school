@@ -1,0 +1,35 @@
+<!-- pages/parent/homework/index.wxml -->
+<view class="container">
+
+  <view class="hint-bar" wx:if="{{list.length > 0}}">
+    <text>📋 共 {{list.length}} 项作业</text>
+  </view>
+
+  <!-- 作业列表 -->
+  <view class="hw-list" wx:if="{{list.length > 0}}">
+    <view class="hw-card" wx:for="{{list}}" wx:key="_id">
+      <view class="hw-title">{{item.title}}</view>
+      <view class="hw-meta">
+        <text class="hw-class">🏫 {{item.className}}</text>
+        <text class="hw-deadline">⏰ 截止 {{item.deadline}}</text>
+      </view>
+      <view class="hw-footer">
+        <text class="hw-time">发布于 {{item.publishTime}}</text>
+        <text class="hw-total">共 {{item.totalCount}} 题</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!loading && list.length === 0}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无作业</text>
+    <text class="empty-sub">关联学生后，可在此查看学生所在班级的作业</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+</view>

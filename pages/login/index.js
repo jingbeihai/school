@@ -88,17 +88,12 @@ Page({
     const pagePaths = {
       'teacher': '/pages/teacher/homeworkList/index',
       'student': '/pages/student/homework/index',
-      'parent': '/pages/parent/home/index'
+      'parent': '/pages/parent/homework/index'
     }
 
     const path = pagePaths[role]
     if (path) {
-      // teacher 和 student 都有 tabBar，必须用 switchTab
-      if (role === 'teacher' || role === 'student') {
-        wx.switchTab({ url: path })
-      } else {
-        wx.redirectTo({ url: path })
-      }
+      wx.switchTab({ url: path })
     } else {
       wx.showToast({ title: '登录成功，首页开发中', icon: 'none' })
     }

@@ -17,7 +17,10 @@
     "pages/student/homeworkDetail/index",
     "pages/student/questionBank/index",
     "pages/student/groupDetail/index",
-    "pages/student/classDetail/index"
+    "pages/student/classDetail/index",
+    "pages/parent/profile/index",
+    "pages/parent/homework/index",
+    "pages/parent/studentDetail/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",
@@ -54,6 +57,14 @@
       },
       {
         "pagePath": "pages/student/profile/index",
+        "text": "我的"
+      },
+      {
+        "pagePath": "pages/parent/homework/index",
+        "text": "作业"
+      },
+      {
+        "pagePath": "pages/parent/profile/index",
         "text": "我的"
       }
     ]

@@ -44,12 +44,12 @@ App({
     const pagePaths = {
       'teacher': '/pages/teacher/homeworkList/index',
       'student': '/pages/student/homework/index',
-      'parent': '/pages/parent/home/index'
+      'parent': '/pages/parent/homework/index'
     }
 
     const path = pagePaths[role]
     if (path) {
-      if (role === 'teacher' || role === 'student') {
+      if (role === 'teacher' || role === 'student' || role === 'parent') {
         wx.switchTab({ url: path })
       } else {
         wx.redirectTo({ url: path })

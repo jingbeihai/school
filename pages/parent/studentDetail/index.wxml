@@ -1,0 +1,48 @@
+<!-- pages/parent/studentDetail/index.wxml -->
+<view class="container" wx:if="{{studentInfo.nickName}}">
+
+  <!-- 学生信息头部 -->
+  <view class="header-card">
+    <view class="header-top">
+      <image class="student-avatar" src="{{studentInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <text class="student-name">{{studentInfo.nickName}}</text>
+    </view>
+    <view class="invite-row" bindtap="onCopyCode">
+      <text class="invite-label">识别码：</text>
+      <text class="invite-code">{{studentInfo.userCode}}</text>
+      <text class="copy-tip">（点击复制）</text>
+    </view>
+    <view class="meta-row">
+      <text class="meta-item">关联时间：{{studentInfo.createTimeStr}}</text>
+      <text class="meta-item">已加入 {{classList.length}} 个班级</text>
+    </view>
+  </view>
+
+  <!-- 加入的班级列表 -->
+  <view class="card-header">
+    <text class="card-title">加入的班级</text>
+    <text class="card-icon">🏫</text>
+  </view>
+
+  <view class="class-list">
+    <view class="class-item" wx:for="{{classList}}" wx:key="_id">
+      <view class="class-info">
+        <text class="class-name">{{item.name}}</text>
+        <text class="class-code">编号：{{item.inviteCode}}</text>
+      </view>
+      <view class="class-meta">
+        <text class="class-count">{{item.studentCount}}人</text>
+        <text class="class-time">加入于 {{item.joinTimeStr}}</text>
+      </view>
+    </view>
+    <view class="empty-class" wx:if="{{classList.length === 0}}">
+      <text class="empty-text">该学生暂未加入任何班级</text>
+    </view>
+  </view>
+
+  <!-- 底部解除关联 -->
+  <view class="bottom-actions">
+    <button class="unlink-btn" bindtap="onUnlink">解除关联</button>
+  </view>
+
+</view>

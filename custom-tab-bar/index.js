@@ -38,6 +38,11 @@ Component({
           { pagePath: '/pages/student/questionBank/index', text: '题库', icon: '📚' },
           { pagePath: '/pages/student/profile/index', text: '我的', icon: '👤' }
         ]
+      } else if (role === 'parent') {
+        tabs = [
+          { pagePath: '/pages/parent/homework/index', text: '作业', icon: '📝' },
+          { pagePath: '/pages/parent/profile/index', text: '我的', icon: '👤' }
+        ]
       }
 
       const selected = tabs.findIndex(t => t.pagePath === currentPath)
