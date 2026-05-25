@@ -3,7 +3,7 @@
 .container {
   min-height: 100vh;
   background: #f5f5f5;
-  padding-bottom: 180rpx;
+  padding-bottom: 280rpx;
 }
 
 /* 头部 */
@@ -198,9 +198,11 @@
   background: #fff;
   box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.06);
   z-index: 10;
+  display: flex;
+  align-items: center;
 }
 .submit-btn {
-  width: 100%;
+  flex: 1;
   height: 88rpx;
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: #fff;
@@ -214,6 +216,78 @@
 }
 .submit-btn[disabled] {
   opacity: 0.7;
+}
+.all-done-text {
+  flex: 1;
+  text-align: center;
+  font-size: 28rpx;
+  color: #27ae60;
+  font-weight: 500;
+}
+
+/* 逐题提交按钮 */
+.q-submit-row {
+  margin-top: 20rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+.q-submit-btn {
+  padding: 12rpx 40rpx;
+  background: #667eea;
+  color: #fff;
+  font-size: 24rpx;
+  border-radius: 30rpx;
+  border: none;
+  line-height: 1.4;
+}
+.q-submit-btn[disabled] {
+  background: #ccc;
+}
+
+/* 逐题提交结果 */
+.q-result-row {
+  margin-top: 20rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+.result-icon {
+  margin-right: 10rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+.result-correct {
+  background: #e8f5e9;
+  color: #27ae60;
+}
+.result-wrong {
+  background: #fdecea;
+  color: #e74c3c;
+}
+
+/* 逐一提交后的只读文本区 */
+.q-textarea-readonly {
+  background: #f0f0f0;
+  min-height: 80rpx;
+  border-color: #ddd;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  color: #666;
+  white-space: pre-wrap;
+}
+
+/* 已提交标记 */
+.q-submitted-tag {
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  background: #e8f5e9;
+  color: #27ae60;
+  margin-left: auto;
 }
 
 /* 收藏选择栏 */

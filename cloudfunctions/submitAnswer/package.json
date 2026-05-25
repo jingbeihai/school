@@ -1,0 +1,7 @@
+{
+  "name": "submitAnswer",
+  "version": "1.0.0",
+  "description": "逐题提交答案并即时批改",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "latest" }
+}

@@ -53,13 +53,16 @@ exports.main = async (event, context) => {
       submissionMap[s.homeworkId] = {
         submitTime: s.submitTime,
         correctCount: s.correctCount,
-        totalCount: s.totalCount
+        totalCount: s.totalCount,
+        status: s.status
       }
     })
 
     // 组装列表
     const list = homeworkRes.data.map(hw => {
       const sub = submissionMap[hw._id]
+      // 只有 status === 'submitted' 才算已提交；逐题进行中的算未完成
+      const isSubmitted = sub && sub.status === 'submitted'
       return {
         _id: hw._id,
         title: hw.title,
@@ -68,7 +71,7 @@ exports.main = async (event, context) => {
         publishTime: hw.publishTime,
         deadline: hw.deadline,
         status: hw.status,
-        submitted: !!sub,
+        submitted: isSubmitted,
         correctCount: sub ? sub.correctCount : 0,
         totalCount: sub ? sub.totalCount : 0,
         submitTime: sub ? sub.submitTime : null

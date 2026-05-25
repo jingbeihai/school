@@ -10,6 +10,12 @@ Page({
     // 答题模式
     answers: {},        // { questionId: answerString }
     submitting: false,
+    // 逐题提交
+    submittedQuestions: {},   // { questionId: true }
+    questionResults: {},      // { questionId: { isCorrect, correctAnswer, explanation } }
+    submittingQuestionId: '',
+    allSubmitted: false,
+    remainCount: 0,
     // 收藏模式
     allFavSelected: false,
     showFavModal: false,
@@ -33,8 +39,9 @@ Page({
     }
   },
 
-  // 预处理题目数据（添加选项字母、处理换行）
+  // 预处理题目数据（添加选项字母、处理换行、格式化用户答案）
   prepareQuestions(questions) {
+    const choiceTypes = ['single_choice', 'multiple_choice']
     return (questions || []).map(q => {
       if (q.options && q.options.length > 0) {
         q.options = q.options.map((opt, i) => ({
@@ -44,6 +51,12 @@ Page({
       }
       if (q.type === 'fill_blank' || q.type === 'essay') {
         q.content = (q.content || '').replace(/\\n/g, '\n')
+        q.userAnswerDisplay = q.userAnswer || ''
+      }
+      // 选择题：格式化 userAnswer 为字母展示（如 "A" / "B, C"）
+      if (choiceTypes.includes(q.type) && q.userAnswer) {
+        const letters = (q.userAnswer || '').replace(/[^a-zA-Z]/g, '').toUpperCase().split('')
+        q.userAnswerDisplay = letters.join(', ')
       }
       return q
     })
@@ -59,10 +72,33 @@ Page({
       wx.hideLoading()
       if (res.result.success) {
         const questions = this.prepareQuestions(res.result.questions)
-        this.setData({
+        const data = {
           homeworkInfo: res.result.homeworkInfo || {},
           questions
-        })
+        }
+
+        // 恢复逐题提交的中间状态
+        const existingAnswers = res.result.existingAnswers
+        if (existingAnswers && existingAnswers.length > 0) {
+          const submittedQuestions = {}
+          const questionResults = {}
+          const answers = {}
+          existingAnswers.forEach(item => {
+            submittedQuestions[item.questionId] = true
+            answers[item.questionId] = item.userAnswer
+            questionResults[item.questionId] = {
+              isCorrect: item.isCorrect,
+              correctAnswer: item.correctAnswer,
+              explanation: item.explanation || ''
+            }
+          })
+          data.submittedQuestions = submittedQuestions
+          data.answers = answers
+          data.questionResults = questionResults
+          data.remainCount = questions.length - Object.keys(submittedQuestions).length
+          data.allSubmitted = data.remainCount <= 0
+        }
+        this.setData(data)
       }
     }).catch(() => {
       wx.hideLoading()
@@ -125,16 +161,55 @@ Page({
     this.setData({ ['answers.' + qid]: e.detail.value })
   },
 
-  // 提交答案
-  onSubmit() {
-    const { homeworkId, questions, answers } = this.data
+  // 逐题提交
+  onSubmitQuestion(e) {
+    const qid = e.currentTarget.dataset.qid
+    const userAnswer = this.data.answers[qid]
+    if (!userAnswer || !userAnswer.trim()) {
+      return wx.showToast({ title: '请先作答', icon: 'none' })
+    }
+    this.setData({ submittingQuestionId: qid })
+    wx.cloud.callFunction({
+      name: 'submitAnswer',
+      data: {
+        homeworkId: this.data.homeworkId,
+        questionId: qid,
+        userAnswer: userAnswer.trim()
+      }
+    }).then(res => {
+      this.setData({ submittingQuestionId: '' })
+      if (res.result.success) {
+        const result = {
+          isCorrect: res.result.isCorrect,
+          correctAnswer: res.result.correctAnswer,
+          explanation: res.result.explanation || ''
+        }
+        const submittedQuestions = { ...this.data.submittedQuestions, [qid]: true }
+        const questionResults = { ...this.data.questionResults, [qid]: result }
+        const allSubmitted = Object.keys(submittedQuestions).length >= this.data.questions.length
+        const remainCount = this.data.questions.length - Object.keys(submittedQuestions).length
+        this.setData({ submittedQuestions, questionResults, allSubmitted, remainCount })
+      } else {
+        wx.showToast({ title: res.result.message, icon: 'none' })
+      }
+    }).catch(() => {
+      this.setData({ submittingQuestionId: '' })
+      wx.showToast({ title: '网络错误', icon: 'none' })
+    })
+  },
 
-    // 检查是否所有题目都已作答
-    const unanswered = questions.filter(q => !answers[q._id] || !answers[q._id].trim())
-    if (unanswered.length > 0) {
+  // 提交答案（批量提交未提交的题目）
+  onSubmit() {
+    const { questions, answers, submittedQuestions } = this.data
+    const unsubmitted = questions.filter(q => !submittedQuestions[q._id] && answers[q._id] && answers[q._id].trim())
+    if (unsubmitted.length === 0) {
+      return wx.showToast({ title: '所有题目已提交', icon: 'none' })
+    }
+    const skipped = questions.filter(q => !submittedQuestions[q._id] && (!answers[q._id] || !answers[q._id].trim()))
+    if (skipped.length > 0) {
       wx.showModal({
         title: '提示',
-        content: '还有 ' + unanswered.length + ' 道题未作答，确定提交吗？',
+        content: '还有 ' + skipped.length + ' 道题未作答，确定提交吗？',
         success: (res) => {
           if (res.confirm) this.doSubmit()
         }
@@ -145,11 +220,18 @@ Page({
   },
 
   doSubmit() {
-    const { homeworkId, questions, answers } = this.data
-    const answerList = questions.map(q => ({
-      questionId: q._id,
-      userAnswer: answers[q._id] || ''
-    }))
+    const { homeworkId, questions, answers, submittedQuestions } = this.data
+    // 只提交未提交过的题目
+    const answerList = questions
+      .filter(q => !submittedQuestions[q._id])
+      .map(q => ({
+        questionId: q._id,
+        userAnswer: answers[q._id] || ''
+      }))
+
+    if (answerList.length === 0) {
+      return wx.showToast({ title: '无待提交题目', icon: 'none' })
+    }
 
     this.setData({ submitting: true })
     wx.cloud.callFunction({
@@ -160,7 +242,15 @@ Page({
       if (res.result.success) {
         wx.showToast({ title: '提交成功', icon: 'success' })
         setTimeout(() => {
-          this.setData({ submitted: true })
+          // 将所有未提交的标记为已提交
+          const submittedQuestions = { ...this.data.submittedQuestions }
+          answerList.forEach(a => { submittedQuestions[a.questionId] = true })
+          this.setData({
+            submitted: true,
+            allSubmitted: true,
+            submittedQuestions,
+            remainCount: 0
+          })
           this.loadSubmissionDetail()
         }, 1000)
       } else {

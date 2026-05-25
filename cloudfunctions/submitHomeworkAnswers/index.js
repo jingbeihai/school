@@ -24,11 +24,18 @@ exports.main = async (event, context) => {
     if (!hwRes.data) return { success: false, message: '作业不存在' }
 
     // 检查是否已提交
+    let existingSubmission = null
     const existRes = await db.collection('submissions')
       .where({ homeworkId, studentId: student._id })
       .get()
     if (existRes.data && existRes.data.length > 0) {
-      return { success: false, message: '你已提交过该作业' }
+      const sub = existRes.data[0]
+      // 已最终提交的不可重复提交
+      if (sub.status === 'submitted') {
+        return { success: false, message: '你已提交过该作业' }
+      }
+      // 逐题进行中的状态：继续合并提交
+      existingSubmission = sub
     }
 
     // 获取所有题目及其正确答案
@@ -45,9 +52,8 @@ exports.main = async (event, context) => {
     const questionMap = {}
     qRes.data.forEach(q => { questionMap[q._id] = q })
 
-    // 批改：比对答案
-    let correctCount = 0
-    const gradedAnswers = answers.map(ans => {
+    // 批改新提交的答案
+    const newGraded = answers.map(ans => {
       const question = questionMap[ans.questionId]
       if (!question) {
         return { questionId: ans.questionId, userAnswer: ans.userAnswer, isCorrect: false }
@@ -55,18 +61,15 @@ exports.main = async (event, context) => {
 
       let isCorrect = false
       if (question.type === 'multiple_choice') {
-        // 多选：归一化后比对
         const normalize = (s) => {
           const chars = (s || '').replace(/[^a-zA-Z]/g, '').toUpperCase()
           return chars.split('').sort().join('')
         }
         isCorrect = normalize(ans.userAnswer) === normalize(question.answer)
       } else {
-        // 其他类型：直接比对（去掉首尾空格）
         isCorrect = (ans.userAnswer || '').trim() === (question.answer || '').trim()
       }
 
-      if (isCorrect) correctCount++
       return {
         questionId: ans.questionId,
         userAnswer: ans.userAnswer || '',
@@ -74,7 +77,17 @@ exports.main = async (event, context) => {
       }
     })
 
-    // 写入提交记录
+    // 合并已有答案（逐题提交的）和新答案
+    const answerMap = {}
+    if (existingSubmission && existingSubmission.answers) {
+      existingSubmission.answers.forEach(a => { answerMap[a.questionId] = a })
+    }
+    newGraded.forEach(a => { answerMap[a.questionId] = a })  // 新答案覆盖或追加
+
+    const mergedAnswers = Object.values(answerMap)
+    const correctCount = mergedAnswers.filter(a => a.isCorrect).length
+
+    // 写入或更新提交记录
     const submitData = {
       homeworkId,
       studentId: student._id,
@@ -82,14 +95,21 @@ exports.main = async (event, context) => {
       status: 'submitted',
       submitTime: new Date(),
       correctCount,
-      totalCount: gradedAnswers.length,
-      answers: gradedAnswers
+      totalCount: mergedAnswers.length,
+      answers: mergedAnswers
     }
 
-    const result = await db.collection('submissions').add({ data: submitData })
+    let submissionId
+    if (existingSubmission) {
+      await db.collection('submissions').doc(existingSubmission._id).update({ data: submitData })
+      submissionId = existingSubmission._id
+    } else {
+      const result = await db.collection('submissions').add({ data: submitData })
+      submissionId = result._id
+    }
 
-    // 自动将错题加入「默认错题本」
-    const wrongAnswers = gradedAnswers.filter(a => !a.isCorrect)
+    // 自动将错题加入「默认错题本」（只处理本次新提交的错题，逐题提交时已单独处理）
+    const wrongAnswers = newGraded.filter(a => !a.isCorrect)
     if (wrongAnswers.length > 0) {
       // 查找或创建「默认错题本」（集合可能尚未创建）
       let errorGroupRes = { data: [] }
@@ -152,10 +172,10 @@ exports.main = async (event, context) => {
     return {
       success: true,
       submission: {
-        _id: result._id,
+        _id: submissionId,
         correctCount,
-        totalCount: gradedAnswers.length,
-        answers: gradedAnswers
+        totalCount: mergedAnswers.length,
+        answers: mergedAnswers
       }
     }
   } catch (err) {

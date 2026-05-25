@@ -50,11 +50,11 @@ exports.main = async (event) => {
 
     const questionIds = hqRes.data.map(item => item.questionId)
     let questions = []
+    const qMap = {}
     if (questionIds.length > 0) {
       const qRes = await db.collection('questions').where({ _id: db.command.in(questionIds) }).get()
-      const qMap = {}
       qRes.data.forEach(q => { qMap[q._id] = q })
-      // 按 homework_questions 的顺序组装，并移除答案字段（学生端不应看到答案）
+      // 按 homework_questions 的顺序组装
       questions = hqRes.data.map(hq => {
         const q = qMap[hq.questionId]
         if (!q) return null
@@ -67,6 +67,30 @@ exports.main = async (event) => {
       }).filter(Boolean)
     }
 
+    // 学生端：检查是否有逐题提交的中间状态，并补全正确答案
+    let existingAnswers = null
+    if (user.role === 'student') {
+      const subRes = await db.collection('submissions')
+        .where({ homeworkId, studentId: user._id })
+        .get()
+      if (subRes.data && subRes.data.length > 0) {
+        const sub = subRes.data[0]
+        if (sub.status === 'submitting') {
+          // 从 qMap 中补全每题的正确答案和解析
+          existingAnswers = (sub.answers || []).map(a => {
+            const q = qMap[a.questionId]
+            return {
+              questionId: a.questionId,
+              userAnswer: a.userAnswer || '',
+              isCorrect: a.isCorrect,
+              correctAnswer: q ? q.answer || '' : '',
+              explanation: q ? q.explanation || '' : ''
+            }
+          })
+        }
+      }
+    }
+
     return {
       success: true,
       homeworkInfo: {
@@ -75,7 +99,8 @@ exports.main = async (event) => {
         deadline: homework.deadline,
         classId: homework.classId
       },
-      questions
+      questions,
+      existingAnswers
     }
   } catch (err) {
     console.error('getHomeworkQuestions error:', err)
