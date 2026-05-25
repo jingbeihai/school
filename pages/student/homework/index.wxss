@@ -60,20 +60,29 @@
   color: #bbb;
 }
 
-.hw-status {
-  font-size: 24rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
+.hw-stats {
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
 }
 
-.hw-status.submitted {
-  background: #e8f5e9;
+.hw-stat-item {
+  font-size: 22rpx;
+  color: #888;
+}
+
+.stat-num {
+  font-weight: 600;
+  color: #667eea;
+}
+
+.stat-num.perfect {
   color: #27ae60;
 }
 
-.hw-status.pending {
-  background: #fff3e0;
+.pending-text {
   color: #f39c12;
+  font-size: 22rpx;
 }
 
 /* 空状态 */

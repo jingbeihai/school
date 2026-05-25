@@ -7,22 +7,23 @@ Page({
     submitted: false,
     homeworkInfo: {},
     questions: [],
+    currentIndex: 0,
     // 答题模式
-    answers: {},        // { questionId: answerString }
+    answers: {},
     submitting: false,
-    // 逐题提交
-    submittedQuestions: {},   // { questionId: true }
-    questionResults: {},      // { questionId: { isCorrect, correctAnswer, explanation } }
+    submittedQuestions: {},
+    questionResults: {},
     submittingQuestionId: '',
-    allSubmitted: false,
-    remainCount: 0,
-    // 收藏模式
-    allFavSelected: false,
+    correctCount: 0,
+    answeredCount: 0,
+    // 收藏
     showFavModal: false,
     favGroups: [],
     selFavGroupId: '',
     favNewName: '',
-    // 类型/难度映射
+    favSelectedCount: 0,
+    allChecked: false,
+    // 标签映射
     typeLabel: { single_choice: '单选', multiple_choice: '多选', fill_blank: '填空', essay: '简答' },
     diffLabel: { easy: '简单', medium: '中等', hard: '困难' }
   },
@@ -39,7 +40,13 @@ Page({
     }
   },
 
-  // 预处理题目数据（添加选项字母、处理换行、格式化用户答案）
+  // 计算当前已回答数量
+  updateAnsweredCount() {
+    const count = Object.keys(this.data.submittedQuestions).length
+    this.setData({ answeredCount: count, currentAnsweredCount: count })
+  },
+
+  // 预处理题目数据
   prepareQuestions(questions) {
     const choiceTypes = ['single_choice', 'multiple_choice']
     return (questions || []).map(q => {
@@ -51,9 +58,7 @@ Page({
       }
       if (q.type === 'fill_blank' || q.type === 'essay') {
         q.content = (q.content || '').replace(/\\n/g, '\n')
-        q.userAnswerDisplay = q.userAnswer || ''
       }
-      // 选择题：格式化 userAnswer 为字母展示（如 "A" / "B, C"）
       if (choiceTypes.includes(q.type) && q.userAnswer) {
         const letters = (q.userAnswer || '').replace(/[^a-zA-Z]/g, '').toUpperCase().split('')
         q.userAnswerDisplay = letters.join(', ')
@@ -62,7 +67,7 @@ Page({
     })
   },
 
-  // 加载答题题目（不含答案）
+  // 加载答题题目
   loadQuestions() {
     wx.showLoading({ title: '加载中...' })
     wx.cloud.callFunction({
@@ -74,7 +79,9 @@ Page({
         const questions = this.prepareQuestions(res.result.questions)
         const data = {
           homeworkInfo: res.result.homeworkInfo || {},
-          questions
+          questions,
+          currentIndex: 0,
+          currentAnsweredCount: 0
         }
 
         // 恢复逐题提交的中间状态
@@ -95,8 +102,18 @@ Page({
           data.submittedQuestions = submittedQuestions
           data.answers = answers
           data.questionResults = questionResults
-          data.remainCount = questions.length - Object.keys(submittedQuestions).length
-          data.allSubmitted = data.remainCount <= 0
+          data.answeredCount = Object.keys(submittedQuestions).length
+          data.correctCount = existingAnswers.filter(a => a.isCorrect).length
+          data.currentAnsweredCount = Object.keys(submittedQuestions).length
+          // 自动定位到第一个未提交的题目
+          let firstUnsubmitted = 0
+          for (let i = 0; i < questions.length; i++) {
+            if (!submittedQuestions[questions[i]._id]) {
+              firstUnsubmitted = i
+              break
+            }
+          }
+          data.currentIndex = firstUnsubmitted
         }
         this.setData(data)
       }
@@ -123,8 +140,9 @@ Page({
         this.setData({
           homeworkInfo: res.result.homeworkInfo || {},
           questions,
+          currentIndex: 0,
           correctCount: res.result.correctCount,
-          totalCount: res.result.totalCount
+          answeredCount: res.result.totalCount
         })
       }
     }).catch(() => {
@@ -133,15 +151,38 @@ Page({
     })
   },
 
-  // === 答题模式 ===
+  // === 导航 ===
 
-  // 单选题
+  onBack() {
+    wx.navigateBack()
+  },
+
+  onPrev() {
+    if (this.data.currentIndex > 0) {
+      this.setData({ currentIndex: this.data.currentIndex - 1 })
+    }
+  },
+
+  onNext() {
+    if (this.data.currentIndex < this.data.questions.length - 1) {
+      this.setData({ currentIndex: this.data.currentIndex + 1 })
+    }
+  },
+
+  onJumpTo(e) {
+    const index = parseInt(e.currentTarget.dataset.index)
+    if (!isNaN(index) && index >= 0 && index < this.data.questions.length) {
+      this.setData({ currentIndex: index })
+    }
+  },
+
+  // === 答题 ===
+
   onSingleChoice(e) {
     const { qid, opt } = e.currentTarget.dataset
     this.setData({ ['answers.' + qid]: opt })
   },
 
-  // 多选题
   onMultiChoice(e) {
     const { qid, opt } = e.currentTarget.dataset
     let current = this.data.answers[qid] || ''
@@ -155,13 +196,12 @@ Page({
     this.setData({ ['answers.' + qid]: opts.sort().join('') })
   },
 
-  // 填空/简答
   onTextInput(e) {
     const qid = e.currentTarget.dataset.qid
     this.setData({ ['answers.' + qid]: e.detail.value })
   },
 
-  // 逐题提交
+  // 提交当前题目
   onSubmitQuestion(e) {
     const qid = e.currentTarget.dataset.qid
     const userAnswer = this.data.answers[qid]
@@ -186,9 +226,22 @@ Page({
         }
         const submittedQuestions = { ...this.data.submittedQuestions, [qid]: true }
         const questionResults = { ...this.data.questionResults, [qid]: result }
-        const allSubmitted = Object.keys(submittedQuestions).length >= this.data.questions.length
-        const remainCount = this.data.questions.length - Object.keys(submittedQuestions).length
-        this.setData({ submittedQuestions, questionResults, allSubmitted, remainCount })
+        const correctCount = this.data.correctCount + (res.result.isCorrect ? 1 : 0)
+        const answeredCount = Object.keys(submittedQuestions).length
+        this.setData({
+          submittedQuestions,
+          questionResults,
+          correctCount,
+          answeredCount,
+          currentAnsweredCount: answeredCount
+        })
+
+        // 如果当前题是最后一题且全部提交完毕
+        if (answeredCount >= this.data.questions.length) {
+          wx.showToast({ title: '全部题目已完成！', icon: 'success' })
+        } else {
+          wx.showToast({ title: res.result.isCorrect ? '回答正确！' : '回答错误', icon: 'none' })
+        }
       } else {
         wx.showToast({ title: res.result.message, icon: 'none' })
       }
@@ -198,102 +251,57 @@ Page({
     })
   },
 
-  // 提交答案（批量提交未提交的题目）
-  onSubmit() {
-    const { questions, answers, submittedQuestions } = this.data
-    const unsubmitted = questions.filter(q => !submittedQuestions[q._id] && answers[q._id] && answers[q._id].trim())
-    if (unsubmitted.length === 0) {
-      return wx.showToast({ title: '所有题目已提交', icon: 'none' })
-    }
-    const skipped = questions.filter(q => !submittedQuestions[q._id] && (!answers[q._id] || !answers[q._id].trim()))
-    if (skipped.length > 0) {
-      wx.showModal({
-        title: '提示',
-        content: '还有 ' + skipped.length + ' 道题未作答，确定提交吗？',
-        success: (res) => {
-          if (res.confirm) this.doSubmit()
-        }
-      })
-    } else {
-      this.doSubmit()
-    }
-  },
-
-  doSubmit() {
-    const { homeworkId, questions, answers, submittedQuestions } = this.data
-    // 只提交未提交过的题目
-    const answerList = questions
-      .filter(q => !submittedQuestions[q._id])
-      .map(q => ({
-        questionId: q._id,
-        userAnswer: answers[q._id] || ''
-      }))
-
-    if (answerList.length === 0) {
-      return wx.showToast({ title: '无待提交题目', icon: 'none' })
-    }
-
-    this.setData({ submitting: true })
-    wx.cloud.callFunction({
-      name: 'submitHomeworkAnswers',
-      data: { homeworkId, answers: answerList }
-    }).then(res => {
-      this.setData({ submitting: false })
-      if (res.result.success) {
-        wx.showToast({ title: '提交成功', icon: 'success' })
-        setTimeout(() => {
-          // 将所有未提交的标记为已提交
-          const submittedQuestions = { ...this.data.submittedQuestions }
-          answerList.forEach(a => { submittedQuestions[a.questionId] = true })
-          this.setData({
-            submitted: true,
-            allSubmitted: true,
-            submittedQuestions,
-            remainCount: 0
-          })
-          this.loadSubmissionDetail()
-        }, 1000)
-      } else {
-        wx.showToast({ title: res.result.message, icon: 'none' })
-      }
-    }).catch(() => {
-      this.setData({ submitting: false })
-      wx.showToast({ title: '网络错误', icon: 'none' })
-    })
-  },
-
   // ===== 收藏功能 =====
 
-  // 已提交模式下勾选题目
-  onFavCheck(e) {
-    const vals = e.detail.value
-    const questions = this.data.questions.map(q => ({
-      ...q, _checked: vals.includes(q._id)
-    }))
-    this.setData({
-      questions,
-      allFavSelected: vals.length === questions.length
-    })
+  onToggleFav(e) {
+    const index = parseInt(e.currentTarget.dataset.index)
+    if (isNaN(index)) return
+    const questions = this.data.questions
+    questions[index]._checked = !questions[index]._checked
+    const favSelectedCount = questions.filter(q => q._checked).length
+    const allChecked = favSelectedCount === questions.length
+    this.setData({ questions, favSelectedCount, allChecked })
   },
 
-  // 全选/取消全选
-  onFavSelectAll() {
-    const allChecked = !this.data.allFavSelected
-    const questions = this.data.questions.map(q => ({
-      ...q, _checked: allChecked
-    }))
-    this.setData({ questions, allFavSelected: allChecked })
+  onToggleSelectAll() {
+    const allChecked = !this.data.allChecked
+    const questions = this.data.questions.map(q => ({ ...q, _checked: allChecked }))
+    const favSelectedCount = allChecked ? questions.length : 0
+    this.setData({ questions, allChecked, favSelectedCount })
   },
 
-  // 获取已勾选的题目 IDs
   getFavSelectedIds() {
     return this.data.questions.filter(q => q._checked).map(q => q._id)
   },
 
-  // 打开收藏弹窗
+  // 收藏当前题目（自动选中当前题）
+  onFavCurrent() {
+    const { questions, currentIndex } = this.data
+    // 保存旧状态
+    this._prevChecked = questions.map(q => !!q._checked)
+    this._favSingleMode = true
+    const newQuestions = questions.map((q, i) => ({ ...q, _checked: i === currentIndex }))
+    this.setData({ questions: newQuestions, favSelectedCount: 1, allChecked: false }, () => {
+      this.onOpenFavModal()
+    })
+  },
+
+  // 恢复收藏前的勾选状态
+  _restoreFavChecked() {
+    if (!this._favSingleMode) return
+    this._favSingleMode = false
+    const questions = this.data.questions.map((q, i) => ({
+      ...q,
+      _checked: this._prevChecked ? !!this._prevChecked[i] : false
+    }))
+    const favSelectedCount = questions.filter(q => q._checked).length
+    const allChecked = favSelectedCount === questions.length && favSelectedCount > 0
+    this.setData({ questions, favSelectedCount, allChecked })
+  },
+
   onOpenFavModal() {
     const ids = this.getFavSelectedIds()
-    if (!ids.length) return wx.showToast({ title: '请至少勾选一题', icon: 'none' })
+    if (!ids.length) return wx.showToast({ title: '请先点击题目旁的 ☆ 选择题目', icon: 'none' })
 
     wx.cloud.callFunction({ name: 'getStudentGroups', data: { type: 'collection' } }).then(res => {
       if (res.result.success) {
@@ -313,6 +321,7 @@ Page({
 
   closeFavModal() {
     this.setData({ showFavModal: false })
+    this._restoreFavChecked()
   },
 
   onSelectFavGroup(e) {
@@ -323,9 +332,8 @@ Page({
     this.setData({ favNewName: e.detail.value, selFavGroupId: '' })
   },
 
-  // 确认收藏
   confirmFav() {
-    const { selFavGroupId, favNewName, homeworkId, questions } = this.data
+    const { selFavGroupId, favNewName, homeworkId } = this.data
     const ids = this.getFavSelectedIds()
 
     const doAdd = (groupId) => {
@@ -336,6 +344,7 @@ Page({
         if (res.result.success) {
           wx.showToast({ title: '收藏成功', icon: 'success' })
           this.setData({ showFavModal: false })
+          this._restoreFavChecked()
         } else {
           wx.showToast({ title: res.result.message, icon: 'none' })
         }
@@ -345,7 +354,6 @@ Page({
     }
 
     if (favNewName.trim()) {
-      // 创建新组并入题
       wx.cloud.callFunction({
         name: 'createStudentGroup',
         data: { name: favNewName.trim(), type: 'collection' }

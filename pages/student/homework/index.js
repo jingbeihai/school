@@ -34,7 +34,9 @@ Page({
   // 进入作业
   goHomework(e) {
     const id = e.currentTarget.dataset.id
-    const submitted = e.currentTarget.dataset.submitted
-    wx.navigateTo({ url: '/pages/student/homeworkDetail/index?homeworkId=' + id + '&submitted=' + (submitted ? '1' : '0') })
+    const answered = parseInt(e.currentTarget.dataset.answered) || 0
+    const total = parseInt(e.currentTarget.dataset.total) || 0
+    const submitted = (answered >= total && total > 0) ? '1' : '0'
+    wx.navigateTo({ url: '/pages/student/homeworkDetail/index?homeworkId=' + id + '&submitted=' + submitted })
   }
 })

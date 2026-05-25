@@ -7,11 +7,12 @@
 
   <!-- 作业列表 -->
   <view class="hw-list" wx:if="{{list.length > 0}}">
-    <view class="hw-card {{item.submitted ? 'done' : ''}}" 
+    <view class="hw-card {{item.answeredCount >= item.totalCount && item.totalCount > 0 ? 'done' : ''}}" 
           wx:for="{{list}}" wx:key="_id" 
           bindtap="goHomework" 
           data-id="{{item._id}}" 
-          data-submitted="{{item.submitted}}">
+          data-answered="{{item.answeredCount}}"
+          data-total="{{item.totalCount}}">
       <view class="hw-title">{{item.title}}</view>
       <view class="hw-meta">
         <text class="hw-class">🏫 {{item.className}}</text>
@@ -19,9 +20,14 @@
       </view>
       <view class="hw-footer">
         <text class="hw-time">发布于 {{item.publishTime}}</text>
-        <view class="hw-status {{item.submitted ? 'submitted' : 'pending'}}">
-          <text wx:if="{{item.submitted}}">✅ {{item.correctCount}}/{{item.totalCount}} 正确</text>
-          <text wx:else>📝 未提交</text>
+        <view class="hw-stats">
+          <text class="hw-stat-item" wx:if="{{item.answeredCount > 0}}">
+            完成度 <text class="stat-num">{{item.answeredCount}}/{{item.totalCount}}</text>
+          </text>
+          <text class="hw-stat-item" wx:if="{{item.answeredCount >= item.totalCount && item.totalCount > 0}}">
+            正确率 <text class="stat-num {{item.correctCount === item.totalCount ? 'perfect' : ''}}">{{item.correctCount}}/{{item.totalCount}}</text>
+          </text>
+          <text wx:if="{{item.answeredCount === 0}}" class="hw-stat-item pending-text">📝 未开始</text>
         </view>
       </view>
     </view>

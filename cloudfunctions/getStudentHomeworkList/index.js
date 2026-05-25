@@ -48,21 +48,29 @@ exports.main = async (event, context) => {
       .where({ homeworkId: _.in(homeworkIds), studentId: student._id })
       .get()
 
+    // 获取每份作业的实际题目总数
+    const hqRes = await db.collection('homework_questions')
+      .where({ homeworkId: _.in(homeworkIds) })
+      .get()
+    const questionCountMap = {}
+    hqRes.data.forEach(hq => {
+      questionCountMap[hq.homeworkId] = (questionCountMap[hq.homeworkId] || 0) + 1
+    })
+
     const submissionMap = {}
     submissionRes.data.forEach(s => {
       submissionMap[s.homeworkId] = {
         submitTime: s.submitTime,
         correctCount: s.correctCount,
-        totalCount: s.totalCount,
-        status: s.status
+        status: s.status,
+        answeredCount: s.status === 'submitted' ? (s.totalCount || 0) : ((s.answers && s.answers.length) || 0)
       }
     })
 
     // 组装列表
     const list = homeworkRes.data.map(hw => {
       const sub = submissionMap[hw._id]
-      // 只有 status === 'submitted' 才算已提交；逐题进行中的算未完成
-      const isSubmitted = sub && sub.status === 'submitted'
+      const totalCount = questionCountMap[hw._id] || 0
       return {
         _id: hw._id,
         title: hw.title,
@@ -71,9 +79,9 @@ exports.main = async (event, context) => {
         publishTime: hw.publishTime,
         deadline: hw.deadline,
         status: hw.status,
-        submitted: isSubmitted,
+        answeredCount: sub ? sub.answeredCount : 0,
         correctCount: sub ? sub.correctCount : 0,
-        totalCount: sub ? sub.totalCount : 0,
+        totalCount: totalCount,
         submitTime: sub ? sub.submitTime : null
       }
     })
