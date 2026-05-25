@@ -32,7 +32,6 @@
       </view>
       <view class="class-meta">
         <text class="class-count">{{item.studentCount}}人</text>
-        <text class="class-time">加入于 {{item.joinTimeStr}}</text>
       </view>
     </view>
     <view class="empty-class" wx:if="{{classList.length === 0}}">

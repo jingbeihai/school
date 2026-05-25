@@ -20,6 +20,7 @@
     "pages/student/classDetail/index",
     "pages/parent/profile/index",
     "pages/parent/homework/index",
+    "pages/parent/homeworkDetail/index",
     "pages/parent/studentDetail/index"
   ],
   "window": {

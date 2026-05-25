@@ -1,0 +1,281 @@
+/* pages/parent/homeworkDetail/index.wxss */
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 160rpx;
+}
+
+/* 头部 */
+.header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 20rpx 30rpx;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.h-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.h-back {
+  font-size: 26rpx;
+  padding: 8rpx 16rpx;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20rpx;
+}
+.h-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0 16rpx;
+}
+.h-score {
+  font-size: 24rpx;
+  background: rgba(255,255,255,0.2);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  white-space: nowrap;
+}
+
+/* ===== 题号导航 ===== */
+.nav-bar {
+  background: #fff;
+  padding: 16rpx 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.nav-scroll {
+  flex: 1;
+  white-space: nowrap;
+}
+.nav-nums {
+  display: inline-flex;
+  gap: 12rpx;
+  padding: 4rpx 0;
+}
+.nav-num {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  background: #f0f0f0;
+  color: #999;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.nav-num.active {
+  background: #667eea;
+  color: #fff;
+  transform: scale(1.1);
+}
+.nav-num.correct {
+  background: #e8f5e9;
+  color: #27ae60;
+  border: 2rpx solid #27ae60;
+}
+.nav-num.wrong {
+  background: #fdecea;
+  color: #e74c3c;
+  border: 2rpx solid #e74c3c;
+}
+.nav-num.active.correct {
+  background: #27ae60;
+  color: #fff;
+}
+.nav-num.active.wrong {
+  background: #e74c3c;
+  color: #fff;
+}
+
+/* ===== 空状态 ===== */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 200rpx;
+}
+.empty-icon { font-size: 100rpx; }
+.empty-text { font-size: 28rpx; color: #999; margin-top: 20rpx; }
+
+/* ===== 单题卡片 ===== */
+.q-single {
+  background: #fff;
+  margin: 20rpx 30rpx;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.q-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+  flex-wrap: wrap;
+}
+.q-index {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #667eea;
+  margin-right: 16rpx;
+}
+.q-type {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  margin-right: 10rpx;
+  color: #fff;
+}
+.type-single_choice { background: #5dade2; }
+.type-multiple_choice { background: #f39c12; }
+.type-fill_blank { background: #27ae60; }
+.type-essay { background: #8e44ad; }
+
+.q-diff {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  color: #fff;
+}
+.diff-easy { background: #27ae60; }
+.diff-medium { background: #f39c12; }
+.diff-hard { background: #e74c3c; }
+
+.q-result {
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  margin-left: auto;
+}
+.q-result.correct { background: #e8f5e9; color: #27ae60; }
+.q-result.wrong { background: #fdecea; color: #e74c3c; }
+
+.q-submitted-tag {
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  background: #e8f5e9;
+  color: #27ae60;
+  margin-left: auto;
+}
+
+.q-content {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.7;
+  margin-bottom: 20rpx;
+}
+
+/* 选项 */
+.q-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+.q-option {
+  display: flex;
+  align-items: flex-start;
+  padding: 16rpx 20rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+}
+.opt-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #667eea;
+  margin-right: 12rpx;
+  min-width: 36rpx;
+}
+.opt-text {
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.5;
+}
+.q-option.opt-correct {
+  background: #e8f5e9;
+  border-color: #27ae60;
+}
+.q-option.opt-wrong {
+  background: #fdecea;
+  border-color: #e74c3c;
+}
+
+/* 答案行 */
+.q-answer-row {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 16rpx;
+  font-size: 26rpx;
+}
+.q-label {
+  color: #888;
+  white-space: nowrap;
+  margin-right: 8rpx;
+}
+.q-correct-ans {
+  color: #27ae60;
+  font-weight: 500;
+  flex: 1;
+  line-height: 1.5;
+}
+.q-user-ans {
+  flex: 1;
+  line-height: 1.5;
+}
+.ans-correct { color: #27ae60; font-weight: 500; }
+.ans-wrong { color: #e74c3c; font-weight: 500; }
+
+.q-explanation {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: #f0f4ff;
+  border-radius: 10rpx;
+  border-left: 6rpx solid #667eea;
+}
+.q-exp-text {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* ===== 上一题/下一题 ===== */
+.nav-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24rpx;
+  padding: 20rpx 30rpx;
+}
+.nav-btn {
+  flex: 1;
+  height: 72rpx;
+  background: #667eea;
+  color: #fff;
+  font-size: 26rpx;
+  border-radius: 36rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-btn[disabled] {
+  background: #ddd;
+  color: #aaa;
+}
+.nav-info {
+  font-size: 26rpx;
+  color: #999;
+  font-weight: 500;
+  white-space: nowrap;
+}

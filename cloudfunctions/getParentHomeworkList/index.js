@@ -2,6 +2,7 @@
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
+const _ = db.command
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
@@ -22,10 +23,12 @@ exports.main = async (event, context) => {
     }
 
     const studentIds = linkRes.data.map(s => s.studentId)
+    const studentMap = {}
+    linkRes.data.forEach(l => { studentMap[l.studentId] = l.studentName || '学生' })
 
     // 获取这些学生加入的班级
     const csRes = await db.collection('class_students').where({
-      studentId: db.command.in(studentIds),
+      studentId: _.in(studentIds),
       status: 'active'
     }).get()
 
@@ -35,41 +38,52 @@ exports.main = async (event, context) => {
 
     const classIds = [...new Set(csRes.data.map(cs => cs.classId))]
 
-    // 获取班级和对应的作业
-    const homeworkList = []
-    for (const classId of classIds) {
-      try {
-        const classRes = await db.collection('classes').doc(classId).get()
-        if (!classRes.data) continue
+    // 查询班级名称
+    const classMap = {}
+    const classRes = await db.collection('classes')
+      .where({ _id: _.in(classIds) })
+      .get()
+    classRes.data.forEach(c => { classMap[c._id] = c.name })
 
-        const hwRes = await db.collection('homework_questions').where({
-          classId,
-          status: db.command.neq('deleted')
-        }).orderBy('publishTime', 'desc').get()
+    // 从 homework 集合查询作业
+    const homeworkRes = await db.collection('homework')
+      .where({ classId: _.in(classIds), status: 'active' })
+      .orderBy('publishTime', 'desc')
+      .get()
 
-        for (const hw of hwRes.data) {
-          homeworkList.push({
-            _id: hw._id,
-            title: hw.title,
-            className: classRes.data.name,
-            publishTime: hw.publishTime,
-            deadline: hw.deadline,
-            totalCount: (hw.questions || []).length
-          })
-        }
-      } catch (e) {
-        // skip errors
-      }
+    if (!homeworkRes.data || homeworkRes.data.length === 0) {
+      return { success: true, list: [] }
     }
 
-    // 按发布时间倒序
-    homeworkList.sort((a, b) => {
-      const tA = a.publishTime ? new Date(a.publishTime).getTime() : 0
-      const tB = b.publishTime ? new Date(b.publishTime).getTime() : 0
-      return tB - tA
+    // 获取每份作业的实际题目数
+    const homeworkIds = homeworkRes.data.map(h => h._id)
+    const hqRes = await db.collection('homework_questions')
+      .where({ homeworkId: _.in(homeworkIds) })
+      .get()
+    const questionCountMap = {}
+    hqRes.data.forEach(hq => {
+      questionCountMap[hq.homeworkId] = (questionCountMap[hq.homeworkId] || 0) + 1
     })
 
-    return { success: true, list: homeworkList }
+    // 按学生展开：同一作业，多个关联学生则展示多条
+    const list = []
+    homeworkRes.data.forEach(hw => {
+      const studentsInClass = csRes.data.filter(cs => cs.classId === hw.classId)
+      studentsInClass.forEach(cs => {
+        list.push({
+          _id: hw._id,
+          studentId: cs.studentId,
+          studentName: studentMap[cs.studentId] || '',
+          title: hw.title,
+          className: classMap[hw.classId] || '',
+          publishTime: hw.publishTime,
+          deadline: hw.deadline,
+          totalCount: questionCountMap[hw._id] || 0
+        })
+      })
+    })
+
+    return { success: true, list }
   } catch (err) {
     console.error('getParentHomeworkList error:', err)
     return { success: false, message: '获取作业列表失败' }

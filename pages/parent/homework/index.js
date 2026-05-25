@@ -29,5 +29,13 @@ Page({
     }).catch(() => {
       this.setData({ loading: false })
     })
+  },
+
+  // 进入作业详情
+  goHomework(e) {
+    const id = e.currentTarget.dataset.id
+    const studentId = e.currentTarget.dataset.studentId
+    const studentName = e.currentTarget.dataset.studentName
+    wx.navigateTo({ url: '/pages/parent/homeworkDetail/index?homeworkId=' + id + '&studentId=' + (studentId || '') + '&studentName=' + encodeURIComponent(studentName || '') })
   }
 })

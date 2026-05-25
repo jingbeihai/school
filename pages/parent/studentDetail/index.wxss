@@ -129,7 +129,7 @@ page { background: #f5f5f5; }
   justify-content: space-between;
 }
 
-.class-count, .class-time {
+.class-count {
   font-size: 22rpx;
   color: #999;
 }

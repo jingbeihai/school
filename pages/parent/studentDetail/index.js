@@ -30,8 +30,7 @@ Page({
         const studentInfo = res.result.studentInfo || {}
         const createTime = studentInfo.createTime ? this.formatDate(studentInfo.createTime) : ''
         const classList = (res.result.classList || []).map(item => ({
-          ...item,
-          joinTimeStr: item.joinTime ? this.formatDate(item.joinTime) : ''
+          ...item
         }))
         this.setData({
           studentInfo: { ...studentInfo, createTimeStr: createTime },
