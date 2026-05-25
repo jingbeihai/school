@@ -191,12 +191,7 @@
     </view>
   </block>
 
-  <!-- 收藏按钮（已提交模式） -->
-  <view class="fav-bar" wx:if="{{submitted && questions.length}}">
-    <button class="fav-btn" bindtap="onOpenFavModal">📁 收藏到组（{{favSelectedCount}}题已选）</button>
-  </view>
-
-  <!-- 收藏弹窗 -->
+  <!-- 收藏弹窗（点击「收藏此题」触发） -->
   <view class="modal" wx:if="{{showFavModal}}">
     <view class="modal-mask" bindtap="closeFavModal"></view>
     <view class="modal-content">
