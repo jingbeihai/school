@@ -1,76 +1,105 @@
 <view class="container">
-  <!-- 顶部：学生姓名 + 正确率 -->
-  <view class="top-bar">
-    <text class="student-name">{{studentName}}</text>
-    <text class="correct-rate">{{correctCount}}/{{totalCount}} 正确</text>
+  <!-- 头部 -->
+  <view class="header">
+    <view class="h-top">
+      <text class="h-back" bindtap="goBack">← 返回</text>
+      <text class="h-title">{{homeworkInfo.title || '作业详情'}}</text>
+      <text class="h-score">{{correctCount}}/{{totalCount}} 正确</text>
+    </view>
+    <text class="h-student">👤 {{studentName}}</text>
   </view>
 
-  <view wx:if="{{!questions.length}}" class="loading">加载中...</view>
+  <!-- 题号导航 -->
+  <view class="nav-bar" wx:if="{{questions.length > 0}}">
+    <scroll-view class="nav-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="nav-nums">
+        <view class="nav-num {{idx === currentIndex ? 'active' : ''}} {{item.hasSubmitted ? (item.isCorrect ? 'correct' : 'wrong') : ''}}"
+              wx:for="{{questions}}" wx:key="questionId"
+              wx:for-index="idx" data-index="{{idx}}"
+              bindtap="onJumpTo">
+          {{idx + 1}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
 
-  <!-- 题目列表 -->
-  <view class="question-list" wx:else>
-    <view class="q-card" wx:for="{{questions}}" wx:key="questionId">
-      <!-- 题号 + 是否正确 -->
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{questions.length === 0}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无题目</text>
+  </view>
+
+  <!-- 单题展示 -->
+  <block wx:if="{{questions.length > 0}}">
+    <view class="q-single">
       <view class="q-header">
-        <text class="q-index">第{{index + 1}}题</text>
-        <text class="q-result {{item.isCorrect ? 'correct' : 'wrong'}}">
-          {{item.isCorrect ? '✓ 正确' : '✗ 错误'}}
-        </text>
+        <text class="q-index">{{studentName}} · 第{{currentIndex + 1}}题</text>
+        <text class="q-type type-{{questions[currentIndex].type}}">{{typeLabel[questions[currentIndex].type]}}</text>
+        <text class="q-diff diff-{{questions[currentIndex].difficulty}}">{{diffLabel[questions[currentIndex].difficulty]}}</text>
+        <block wx:if="{{questions[currentIndex].hasSubmitted}}">
+          <text wx:if="{{questions[currentIndex].isCorrect}}" class="q-result correct">✓ 正确</text>
+          <text wx:if="{{!questions[currentIndex].isCorrect}}" class="q-result wrong">✗ 错误</text>
+        </block>
+        <text wx:if="{{!questions[currentIndex].hasSubmitted}}" class="q-submitted-tag" style="background:#fff3e0;color:#f39c12;">未作答</text>
       </view>
 
-      <!-- 题干 -->
-      <view class="q-content">{{item.content}}</view>
+      <view class="q-content">{{questions[currentIndex].content}}</view>
 
-      <!-- 选项 -->
-      <view class="q-options" wx:if="{{item.options && item.options.length}}">
-        <text wx:for="{{item.options}}" wx:key="index" wx:for-item="opt" class="opt-item">{{opt}}</text>
-      </view>
-
-      <!-- 学生答案 / 正确答案 -->
-      <view class="q-answers">
-        <view class="ans-row">
-          <text class="ans-label">学生答案：</text>
-          <text class="ans-val student-ans {{item.isCorrect ? '' : 'wrong'}}">{{item.userAnswer || '未作答'}}</text>
-        </view>
-        <view class="ans-row" wx:if="{{item.type !== 'essay'}}">
-          <text class="ans-label">正确答案：</text>
-          <text class="ans-val correct-ans">{{item.answer}}</text>
-        </view>
-        <view class="ans-row" wx:if="{{item.explanation}}">
-          <text class="ans-label">解析：</text>
-          <text class="ans-val explain">{{item.explanation}}</text>
+      <!-- 选择题选项：正确项绿色 + 学生错选项红色 -->
+      <view class="q-options" wx:if="{{questions[currentIndex].type === 'single_choice' || questions[currentIndex].type === 'multiple_choice'}}">
+        <view class="q-option {{opt.letter === questions[currentIndex].answer || (questions[currentIndex].answer && questions[currentIndex].answer.indexOf(opt.letter) >= 0) ? 'opt-correct' : (questions[currentIndex].userAnswer && questions[currentIndex].userAnswer.indexOf(opt.letter) >= 0 && !questions[currentIndex].isCorrect ? 'opt-wrong' : '')}}"
+              wx:for="{{questions[currentIndex].options}}" wx:for-item="opt" wx:key="letter">
+          <text class="opt-label">{{opt.letter}}.</text>
+          <text class="opt-text">{{opt.text}}</text>
         </view>
       </view>
 
-      <!-- 单题评语 -->
-      <view class="comment-box">
-        <text class="comment-label">评语：</text>
-        <textarea
-          class="comment-input"
-          placeholder="输入对该题的评语..."
-          value="{{questionComments[item.questionId]}}"
-          bindinput="onQuestionComment"
-          data-qid="{{item.questionId}}"
-          auto-height
-        />
+      <!-- 非选择题选项 -->
+      <view class="q-options" wx:elif="{{questions[currentIndex].options && questions[currentIndex].options.length}}">
+        <text wx:for="{{questions[currentIndex].options}}" wx:key="index" wx:for-item="opt" class="opt-item">{{opt}}</text>
+      </view>
+
+      <!-- 学生答案行 -->
+      <view class="q-answer-row">
+        <text class="q-label">学生作答：</text>
+        <text class="q-user-ans {{questions[currentIndex].isCorrect ? 'ans-correct' : 'ans-wrong'}}">{{questions[currentIndex].userAnswerDisplay || questions[currentIndex].userAnswer || '未作答'}}</text>
+      </view>
+
+      <!-- 正确答案 -->
+      <view class="q-answer-row" wx:if="{{questions[currentIndex].type !== 'essay'}}">
+        <text class="q-label">正确答案：</text>
+        <text class="q-correct-ans">{{questions[currentIndex].answerDisplay || questions[currentIndex].answer}}</text>
+      </view>
+
+      <!-- 解析 -->
+      <view class="q-explanation" wx:if="{{questions[currentIndex].explanation}}">
+        <text class="q-label">解析：</text>
+        <text class="q-exp-text">{{questions[currentIndex].explanation}}</text>
       </view>
     </view>
-  </view>
 
-  <!-- 整体评语 -->
-  <view class="overall-comment" wx:if="{{questions.length}}">
-    <text class="comment-title">整体评语</text>
-    <textarea
-      class="comment-input big"
-      placeholder="输入整体评语..."
-      value="{{teacherComment}}"
-      bindinput="onTeacherComment"
-      auto-height
-    />
-  </view>
+    <!-- 上一题 / 下一题 -->
+    <view class="nav-btns">
+      <button class="nav-btn" bindtap="onPrev" disabled="{{currentIndex === 0}}">← 上一题</button>
+      <text class="nav-info">{{currentIndex + 1}}/{{questions.length}}</text>
+      <button class="nav-btn" bindtap="onNext" disabled="{{currentIndex >= questions.length - 1}}">下一题 →</button>
+    </view>
 
-  <!-- 保存按钮 -->
-  <view class="bottom-bar" wx:if="{{questions.length}}">
-    <button class="save-btn" bindtap="saveAllComments" loading="{{saving}}">保存评语</button>
-  </view>
+    <!-- 每题评语 -->
+    <view class="per-question-comment">
+      <text class="comment-title">第{{currentIndex + 1}}题评语</text>
+      <textarea
+        class="comment-input big"
+        placeholder="输入对该题的评语..."
+        value="{{questionComments[questions[currentIndex].questionId]}}"
+        bindinput="onQuestionComment"
+        auto-height
+      />
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="nav-btns">
+      <button class="nav-btn submit-btn" bindtap="submitComments" loading="{{saving}}">提交评语</button>
+    </view>
+  </block>
 </view>

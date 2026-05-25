@@ -2,9 +2,9 @@
   <!-- 作业信息 -->
   <view class="header" wx:if="{{homework}}">
     <text class="hw-title">{{homework.title}}</text>
-    <view class="hw-info">
-      <text>班级：{{homework.className || '未知'}}</text>
-      <text wx:if="{{homework.deadline}}">截止：{{homework.deadline}}</text>
+    <view class="hw-meta">
+      <text class="hw-class">🏫 {{homework.className || '未知'}}</text>
+      <text wx:if="{{homework.deadline}}">⏰ 截止 {{homework.deadline}}</text>
     </view>
   </view>
 
@@ -13,30 +13,39 @@
     <input class="search-input" placeholder="搜索学生姓名或学号" value="{{searchKey}}" bindinput="onSearch" />
   </view>
 
+  <!-- 提示 -->
+  <view class="hint-bar" wx:if="{{filteredStudents.length > 0}}">
+    <text>📋 共 {{filteredStudents.length}} 名学生</text>
+  </view>
+
   <!-- 列表 -->
   <view wx:if="{{loading && !students.length}}" class="loading">加载中...</view>
   <block wx:elif="{{!filteredStudents.length}}">
     <view class="empty">
-      <text>{{students.length ? '没有匹配的学生' : '暂无学生数据'}}</text>
+      <text class="empty-icon">📭</text>
+      <text class="empty-text">{{students.length ? '没有匹配的学生' : '暂无学生数据'}}</text>
     </view>
   </block>
 
   <view class="student-list" wx:else>
     <view
-      class="student-item {{item.status === 'submitted' ? 'clickable' : 'disabled'}}"
+      class="student-card {{item.status === 'answered' ? 'clickable' : 'disabled'}}"
       wx:for="{{filteredStudents}}"
       wx:key="studentId"
       bindtap="goDetail"
       data-student="{{item}}"
     >
-      <view class="student-left">
-        <text class="student-name">{{item.name}}</text>
-        <text class="student-code">{{item.userCode}}</text>
+      <view class="card-header">
+        <text class="card-name">{{item.name}}</text>
+        <text wx:if="{{item.status === 'answered'}}" class="card-badge badge-ok">已作答</text>
+        <text wx:else class="card-badge badge-no">未作答</text>
       </view>
-      <view class="student-right">
-        <text wx:if="{{item.status === 'submitted'}}" class="rate">{{item.correctCount}}/{{item.totalCount}}</text>
-        <text wx:else class="status-tag not-submit">未提交</text>
-        <text wx:if="{{item.status === 'submitted'}}" class="arrow">〉</text>
+      <view class="card-meta">
+        <text class="card-code">学号：{{item.userCode}}</text>
+        <text wx:if="{{item.status === 'answered'}}" class="card-rate">{{item.correctCount}}/{{item.totalCount}} 正确</text>
+      </view>
+      <view class="card-footer" wx:if="{{item.status === 'answered'}}">
+        <text class="card-tip">点击查看答题详情 →</text>
       </view>
     </view>
   </view>

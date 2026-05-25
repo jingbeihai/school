@@ -54,13 +54,14 @@ exports.main = async () => {
         totalStudents = countRes.total
       } catch (e) {}
 
-      // 统计已提交学生数
-      let submittedCount = 0
+      // 统计已作答学生数（answers 非空即算已作答）
+      let answeredCount = 0
       try {
         const subRes = await db.collection('submissions')
-          .where({ homeworkId: hw._id, status: 'submitted' })
-          .count()
-        submittedCount = subRes.total
+          .where({ homeworkId: hw._id })
+          .field({ answers: true })
+          .get()
+        answeredCount = subRes.data.filter(s => s.answers && s.answers.length > 0).length
       } catch (e) {}
 
       return {
@@ -71,7 +72,7 @@ exports.main = async () => {
         publishTime: hw.publishTime,
         deadline: hw.deadline,
         totalStudents,
-        submittedCount
+        answeredCount
       }
     }))
 

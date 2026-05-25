@@ -62,6 +62,12 @@
         <text class="q-label">解析：</text>
         <text class="q-exp-text">{{questions[currentIndex].explanation}}</text>
       </view>
+
+      <!-- 教师评语 -->
+      <view class="q-comment" wx:if="{{questions[currentIndex].comment}}">
+        <text class="q-label">教师评语：</text>
+        <text class="q-comment-text">{{questions[currentIndex].comment}}</text>
+      </view>
     </view>
 
     <!-- 上一题 / 下一题 -->

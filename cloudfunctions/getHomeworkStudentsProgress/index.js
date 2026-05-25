@@ -34,9 +34,10 @@ exports.main = async (event) => {
       className = cls.data ? cls.data.name : ''
     } catch (e) {}
 
-    // 获取所有提交记录
+    // 获取所有提交记录（answers 非空即算已作答）
     const submissions = await db.collection('submissions')
-      .where({ homeworkId, status: 'submitted' })
+      .where({ homeworkId })
+      .field({ studentId: true, answers: true, correctCount: true, totalCount: true, submitTime: true })
       .get()
 
     const submissionMap = {}
@@ -55,14 +56,15 @@ exports.main = async (event) => {
       } catch (e) {}
 
       const sub = submissionMap[uid]
-      if (sub) {
+      if (sub && sub.answers && sub.answers.length > 0) {
         return {
           studentId: uid,
           name: userName || '未知',
           userCode,
-          status: 'submitted',
+          status: 'answered',
           correctCount: sub.correctCount || 0,
           totalCount: sub.totalCount || 0,
+          answeredCount: sub.answers.length,
           correctRate: sub.totalCount ? Math.round((sub.correctCount / sub.totalCount) * 100) : 0,
           submitTime: sub.submitTime
         }
@@ -71,9 +73,10 @@ exports.main = async (event) => {
         studentId: uid,
         name: userName || '未知',
         userCode,
-        status: 'not_submitted',
+        status: 'not_answered',
         correctCount: 0,
         totalCount: 0,
+        answeredCount: 0,
         correctRate: 0,
         submitTime: null
       }

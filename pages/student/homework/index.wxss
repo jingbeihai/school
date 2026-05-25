@@ -24,10 +24,15 @@
   padding: 28rpx 30rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+  position: relative;
 }
 
 .hw-card.done {
   opacity: 0.75;
+}
+
+.hw-card.has-notify {
+  border: 2rpx solid #667eea;
 }
 
 .hw-title {
@@ -35,6 +40,19 @@
   font-weight: 600;
   color: #333;
   margin-bottom: 14rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.hw-new-badge {
+  font-size: 20rpx;
+  background: #ff4757;
+  color: #fff;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .hw-meta {

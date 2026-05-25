@@ -6,11 +6,13 @@ Page({
     homeworkInfo: null,
     studentName: '',
     questions: [],
+    currentIndex: 0,
     correctCount: 0,
     totalCount: 0,
-    teacherComment: '',
     questionComments: {},
-    saving: false
+    saving: false,
+    typeLabel: { single_choice: '单选', multiple_choice: '多选', fill_blank: '填空', essay: '简答' },
+    diffLabel: { easy: '简单', medium: '中等', hard: '困难' }
   },
 
   onLoad(options) {
@@ -43,14 +45,15 @@ Page({
       }
       const qComments = {}
       r.questions.forEach(q => { qComments[q.questionId] = q.comment || '' })
+      const questions = this.prepareQuestions(r.questions || [])
       this.setData({
         submissionId: r.submissionId,
         homeworkInfo: r.homeworkInfo,
         studentName: r.studentName,
-        questions: r.questions,
+        questions,
+        currentIndex: 0,
         correctCount: r.correctCount,
         totalCount: r.totalCount,
-        teacherComment: r.teacherComment || '',
         questionComments: qComments
       })
     }).catch(err => {
@@ -59,55 +62,89 @@ Page({
     })
   },
 
+  prepareQuestions(questions) {
+    const choiceTypes = ['single_choice', 'multiple_choice']
+    return questions.map(q => {
+      if (q.options && q.options.length > 0) {
+        q.options = q.options.map((opt, i) => ({
+          text: opt,
+          letter: String.fromCharCode(65 + i)
+        }))
+      }
+      if (q.type === 'fill_blank' || q.type === 'essay') {
+        q.content = (q.content || '').replace(/\\n/g, '\n')
+      }
+      if (choiceTypes.includes(q.type) && q.answer) {
+        const letters = (q.answer || '').replace(/[^a-zA-Z]/g, '').toUpperCase().split('')
+        q.answerDisplay = letters.join(', ')
+      }
+      if (choiceTypes.includes(q.type) && q.userAnswer) {
+        const letters = (q.userAnswer || '').replace(/[^a-zA-Z]/g, '').toUpperCase().split('')
+        q.userAnswerDisplay = letters.join(', ')
+      }
+      return q
+    })
+  },
+
   onQuestionComment(e) {
-    const qId = e.currentTarget.dataset.qid
-    const val = e.detail.value
-    const qComments = this.data.questionComments
-    qComments[qId] = val
+    const currentQ = this.data.questions[this.data.currentIndex]
+    if (!currentQ) return
+    const qComments = { ...this.data.questionComments }
+    qComments[currentQ.questionId] = e.detail.value
     this.setData({ questionComments: qComments })
   },
 
-  onTeacherComment(e) {
-    this.setData({ teacherComment: e.detail.value })
+  // 返回
+  goBack() {
+    wx.navigateBack()
   },
 
-  async saveAllComments() {
-    const { submissionId, questionComments, teacherComment, saving } = this.data
+  // 跳转到指定题
+  onJumpTo(e) {
+    const index = parseInt(e.currentTarget.dataset.index)
+    const questions = this.data.questions
+    if (!isNaN(index) && index >= 0 && index < questions.length) {
+      this.setData({ currentIndex: index })
+    }
+  },
+
+  // 上一题
+  onPrev() {
+    if (this.data.currentIndex > 0) {
+      this.setData({ currentIndex: this.data.currentIndex - 1 })
+    }
+  },
+
+  // 下一题
+  onNext() {
+    if (this.data.currentIndex < this.data.questions.length - 1) {
+      this.setData({ currentIndex: this.data.currentIndex + 1 })
+    }
+  },
+
+  async submitComments() {
+    const { submissionId, questionComments, saving } = this.data
     if (saving) return
     if (!submissionId) return
 
     this.setData({ saving: true })
-    wx.showLoading({ title: '保存中...' })
+    wx.showLoading({ title: '提交中...' })
 
     try {
-      // 批量保存单题评语
       for (const qId in questionComments) {
         await wx.cloud.callFunction({
           name: 'saveComment',
-          data: {
-            submissionId,
-            questionId: qId,
-            comment: questionComments[qId]
-          }
+          data: { submissionId, questionId: qId, comment: questionComments[qId] }
         })
       }
 
-      // 保存整体评语
-      await wx.cloud.callFunction({
-        name: 'saveComment',
-        data: {
-          submissionId,
-          comment: teacherComment
-        }
-      })
-
       wx.hideLoading()
-      wx.showToast({ title: '评语已保存', icon: 'success' })
+      wx.showToast({ title: '评语已提交', icon: 'success' })
       this.setData({ saving: false })
     } catch (err) {
       wx.hideLoading()
       this.setData({ saving: false })
-      wx.showToast({ title: '保存失败', icon: 'none' })
+      wx.showToast({ title: '提交失败', icon: 'none' })
     }
   }
 })

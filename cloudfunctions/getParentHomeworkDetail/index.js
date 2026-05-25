@@ -72,7 +72,7 @@ exports.main = async (event, context) => {
 
     const studentName = linkRes.data[0].studentName || '学生'
 
-    // 组装题目列表（含学生作答）
+    // 组装题目列表（含学生作答+教师评语）
     let questions = hqRes.data.map(hq => {
       const q = qMap[hq.questionId]
       if (!q) return null
@@ -88,12 +88,21 @@ exports.main = async (event, context) => {
         // 学生作答
         userAnswer: ans ? ans.userAnswer : null,
         isCorrect: ans ? !!ans.isCorrect : null,
-        hasSubmitted: !!ans
+        hasSubmitted: !!ans,
+        // 教师评语
+        teacherComment: ans ? (ans.comment || '') : ''
       }
     }).filter(Boolean)
 
     const answeredCount = questions.filter(q => q.hasSubmitted).length
     const correctCount = questions.filter(q => q.isCorrect === true).length
+
+    // 清除新评语标记（家长已查看）
+    if (submission && submission.hasNewComment) {
+      await db.collection('submissions').doc(submission._id).update({
+        data: { hasNewComment: false }
+      })
+    }
 
     return {
       success: true,

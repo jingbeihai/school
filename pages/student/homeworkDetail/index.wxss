@@ -305,6 +305,20 @@
   line-height: 1.6;
 }
 
+/* 教师评语 */
+.q-comment {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: #fff8e1;
+  border-radius: 10rpx;
+  border-left: 6rpx solid #f39c12;
+}
+.q-comment-text {
+  font-size: 24rpx;
+  color: #8d6e00;
+  line-height: 1.6;
+}
+
 /* 提交此题 */
 .q-submit-row {
   margin-top: 24rpx;

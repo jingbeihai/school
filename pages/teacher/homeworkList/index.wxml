@@ -27,9 +27,9 @@
       </view>
       <view class="card-progress">
         <view class="progress-bar">
-          <view class="progress-fill" style="width: {{item.totalStudents ? (item.submittedCount / item.totalStudents * 100) : 0}}%"></view>
+          <view class="progress-fill" style="width: {{item.totalStudents ? (item.answeredCount / item.totalStudents * 100) : 0}}%"></view>
         </view>
-        <text class="progress-text">{{item.submittedCount}}/{{item.totalStudents}} 已提交</text>
+        <text class="progress-text">{{item.answeredCount}}/{{item.totalStudents}} 已作答</text>
       </view>
     </view>
   </block>

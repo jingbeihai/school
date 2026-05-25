@@ -58,7 +58,7 @@ Page({
 
   goDetail(e) {
     const student = e.currentTarget.dataset.student
-    if (student && student.status === 'submitted') {
+    if (student && student.status === 'answered') {
       wx.navigateTo({
         url: `/pages/teacher/reviewStudent/index?homeworkId=${this.data.homeworkId}&studentId=${student.studentId}`
       })

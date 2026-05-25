@@ -65,11 +65,22 @@ exports.main = async (event, context) => {
       questionCountMap[hq.homeworkId] = (questionCountMap[hq.homeworkId] || 0) + 1
     })
 
+    // 查询提交记录，检测是否有新评语
+    const submissions = await db.collection('submissions')
+      .where({ homeworkId: _.in(homeworkIds), studentId: _.in(studentIds) })
+      .field({ homeworkId: true, studentId: true, hasNewComment: true })
+      .get()
+    const newCommentMap = {}
+    submissions.data.forEach(s => {
+      newCommentMap[`${s.homeworkId}_${s.studentId}`] = !!s.hasNewComment
+    })
+
     // 按学生展开：同一作业，多个关联学生则展示多条
     const list = []
     homeworkRes.data.forEach(hw => {
       const studentsInClass = csRes.data.filter(cs => cs.classId === hw.classId)
       studentsInClass.forEach(cs => {
+        const key = `${hw._id}_${cs.studentId}`
         list.push({
           _id: hw._id,
           studentId: cs.studentId,
@@ -78,7 +89,8 @@ exports.main = async (event, context) => {
           className: classMap[hw.classId] || '',
           publishTime: hw.publishTime,
           deadline: hw.deadline,
-          totalCount: questionCountMap[hw._id] || 0
+          totalCount: questionCountMap[hw._id] || 0,
+          hasNewComment: newCommentMap[key] || false
         })
       })
     })

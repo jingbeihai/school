@@ -81,7 +81,8 @@ exports.main = async (event) => {
           explanation: q.explanation || '',
           difficulty: q.difficulty || 'medium',
           userAnswer: answer ? answer.userAnswer : null,
-          isCorrect: answer ? answer.isCorrect : false,
+          isCorrect: answer ? !!answer.isCorrect : false,
+          hasSubmitted: !!answer,
           comment: answer ? (answer.comment || '') : ''
         }
       }).filter(Boolean)
@@ -94,6 +95,13 @@ exports.main = async (event) => {
         const u = await db.collection('users').doc(studentId).get()
         studentName = u.data ? (u.data.name || u.data.nickName || '') : ''
       } catch (e) {}
+    }
+
+    // 清除新评语标记（学生已查看）
+    if (submission && submission.hasNewComment) {
+      await db.collection('submissions').doc(submission._id).update({
+        data: { hasNewComment: false }
+      })
     }
 
     return {

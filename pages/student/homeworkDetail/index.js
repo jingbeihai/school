@@ -136,7 +136,10 @@ Page({
     }).then(res => {
       wx.hideLoading()
       if (res.result.success) {
+        // 调试：检查评语是否返回
+        console.log('getStudentHomeworkDetail questions:', JSON.stringify((res.result.questions || []).map(q => ({ _id: q._id, comment: q.comment }))))
         const questions = this.prepareQuestions(res.result.questions)
+        console.log('after prepareQuestions:', JSON.stringify(questions.map(q => ({ _id: q._id, comment: q.comment }))))
         this.setData({
           homeworkInfo: res.result.homeworkInfo || {},
           questions,

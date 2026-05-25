@@ -7,8 +7,11 @@
 
   <!-- 作业列表 -->
   <view class="hw-list" wx:if="{{list.length > 0}}">
-    <view class="hw-card" wx:for="{{list}}" wx:key="_id" bindtap="goHomework" data-id="{{item._id}}" data-student-id="{{item.studentId}}" data-student-name="{{item.studentName}}">
-      <view class="hw-title">{{item.title}}</view>
+    <view class="hw-card {{item.hasNewComment ? 'has-notify' : ''}}" wx:for="{{list}}" wx:key="_id" bindtap="goHomework" data-id="{{item._id}}" data-student-id="{{item.studentId}}" data-student-name="{{item.studentName}}">
+      <view class="hw-title">
+        {{item.title}}
+        <text class="hw-new-badge" wx:if="{{item.hasNewComment}}">新评语</text>
+      </view>
       <view class="hw-meta">
         <text class="hw-class">🏫 {{item.className}}</text>
         <text class="hw-student">👤 {{item.studentName}}</text>

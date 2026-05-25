@@ -63,7 +63,8 @@ exports.main = async (event, context) => {
         submitTime: s.submitTime,
         correctCount: s.correctCount,
         status: s.status,
-        answeredCount: s.status === 'submitted' ? (s.totalCount || 0) : ((s.answers && s.answers.length) || 0)
+        answeredCount: s.status === 'submitted' ? (s.totalCount || 0) : ((s.answers && s.answers.length) || 0),
+        hasNewComment: !!s.hasNewComment
       }
     })
 
@@ -82,7 +83,8 @@ exports.main = async (event, context) => {
         answeredCount: sub ? sub.answeredCount : 0,
         correctCount: sub ? sub.correctCount : 0,
         totalCount: totalCount,
-        submitTime: sub ? sub.submitTime : null
+        submitTime: sub ? sub.submitTime : null,
+        hasNewComment: sub ? sub.hasNewComment : false
       }
     })
 

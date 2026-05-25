@@ -18,6 +18,8 @@ exports.main = async (event) => {
     const subRes = await db.collection('submissions').doc(submissionId).get()
     if (!subRes.data) return { success: false, message: '提交记录不存在' }
 
+    const updateData = { reviewedAt: db.serverDate() }
+
     if (questionId) {
       // 保存单题评语：更新 answers 数组中对应题目的 comment
       const answers = subRes.data.answers || []
@@ -25,15 +27,15 @@ exports.main = async (event) => {
       if (idx === -1) return { success: false, message: '题目不存在' }
 
       answers[idx].comment = comment || ''
-      await db.collection('submissions').doc(submissionId).update({
-        data: { answers }
-      })
+      updateData.answers = answers
     } else {
-      // 保存整体评语
-      await db.collection('submissions').doc(submissionId).update({
-        data: { teacherComment: comment || '' }
-      })
+      // 保存整体评语（保留兼容）
+      updateData.teacherComment = comment || ''
     }
+
+    // 标记为有新评语，学生端可看到提醒
+    updateData.hasNewComment = true
+    await db.collection('submissions').doc(submissionId).update({ data: updateData })
 
     return { success: true }
   } catch (err) {
