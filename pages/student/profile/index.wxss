@@ -127,39 +127,11 @@
   white-space: nowrap;
 }
 
-.card-teacher {
-  font-size: 22rpx;
-  color: rgba(255,255,255,0.85);
-  margin-top: 8rpx;
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.card-code {
-  font-size: 22rpx;
-  color: rgba(255,255,255,0.9);
-  margin-top: 4rpx;
-  display: block;
-  letter-spacing: 2rpx;
-}
-
-.card-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10rpx;
-}
-
 .card-count {
   font-size: 20rpx;
   color: rgba(255,255,255,0.7);
-}
-
-.card-time {
-  font-size: 20rpx;
-  color: rgba(255,255,255,0.7);
+  margin-top: 8rpx;
+  display: block;
 }
 
 /* 加入班级卡片 */

@@ -1,4 +1,41 @@
 <!-- pages/student/classDetail/index.wxml -->
-<view class="container">
-  <text class="placeholder">班级详情开发中</text>
+<view class="container" wx:if="{{classInfo._id}}">
+
+  <!-- 班级信息头部 -->
+  <view class="header-card">
+    <view class="header-top">
+      <text class="class-name">{{classInfo.name}}</text>
+    </view>
+    <view class="invite-row" bindtap="onCopyInviteCode">
+      <text class="invite-label">班级编号：</text>
+      <text class="invite-code">{{classInfo.inviteCode}}</text>
+      <text class="copy-tip">（点击复制）</text>
+    </view>
+    <view class="meta-row">
+      <text class="meta-item">加入时间：{{classInfo.joinTimeStr}}</text>
+      <text class="meta-item">学生人数：{{classInfo.studentCount}}人</text>
+    </view>
+  </view>
+
+  <!-- 教师信息 -->
+  <view class="teacher-card">
+    <view class="card-header">
+      <text class="card-title">教师信息</text>
+      <text class="card-icon">🧑‍🏫</text>
+    </view>
+    <view class="teacher-content">
+      <image class="teacher-avatar" src="{{teacherInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="teacher-info">
+        <text class="teacher-name">{{teacherInfo.teacherName || '未知'}}</text>
+        <text class="teacher-code" wx:if="{{teacherInfo.userCode}}">编号：{{teacherInfo.userCode}}</text>
+        <text class="teacher-phone" wx:if="{{teacherInfo.phone}}">手机：{{teacherInfo.phone}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部退出按钮 -->
+  <view class="bottom-actions">
+    <button class="leave-class-btn" bindtap="onLeaveClass">退出班级</button>
+  </view>
+
 </view>

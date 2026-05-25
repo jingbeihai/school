@@ -212,37 +212,5 @@ Page({
   onOpenClass(e) {
     const id = e.currentTarget.dataset.id
     wx.navigateTo({ url: '/pages/student/classDetail/index?classId=' + id })
-  },
-
-  // 长按退出班级
-  onLeaveClass(e) {
-    const id = e.currentTarget.dataset.id
-    const name = e.currentTarget.dataset.name || '该班级'
-    wx.showModal({
-      title: '退出班级',
-      content: '确定要退出「' + name + '」吗？退出后老师布置的作业将不再向你推送。',
-      confirmText: '确定退出',
-      confirmColor: '#e74c3c',
-      success: (res) => {
-        if (res.confirm) {
-          wx.showLoading({ title: '退出中...' })
-          wx.cloud.callFunction({
-            name: 'leaveClass',
-            data: { classId: id }
-          }).then(res => {
-            wx.hideLoading()
-            if (res.result.success) {
-              wx.showToast({ title: '已退出', icon: 'success' })
-              this.fetchClassList()
-            } else {
-              wx.showToast({ title: res.result.message || '退出失败', icon: 'none' })
-            }
-          }).catch(() => {
-            wx.hideLoading()
-            wx.showToast({ title: '网络错误', icon: 'none' })
-          })
-        }
-      }
-    })
   }
 })
