@@ -33,7 +33,7 @@
 .btn-row { display: flex; gap: 20rpx; padding: 0 30rpx; }
 
 /* 题目列表 */
-.question-section { padding: 0 24rpx 20rpx; }
+.question-section { padding: 0 24rpx 340rpx; }
 .section-header { display: flex; justify-content: space-between; align-items: center; padding: 20rpx 10rpx; }
 .back-btn { font-size: 26rpx; color: #667eea; flex-shrink: 0; margin-right: 16rpx; }
 .section-title { font-size: 30rpx; font-weight: bold; color: #333; }
@@ -65,10 +65,10 @@
 .q-answer { font-size: 26rpx; color: #27ae60; margin-bottom: 6rpx; }
 .q-explanation { font-size: 24rpx; color: #999; }
 
-/* 底部操作栏 */
+/* 底部操作栏 —— 悬浮在自定义 tab-bar 上方，不重叠 */
 .bottom-bar {
-  display: flex; gap: 24rpx;
-  padding: 20rpx 0;
+  position: fixed; bottom: 200rpx; left: 0; right: 0; display: flex; gap: 24rpx;
+  padding: 16rpx 30rpx; background: #fff; box-shadow: 0 -2rpx 20rpx rgba(0,0,0,0.1);
 }
 .btn-bar {
   flex: 1; height: 80rpx; line-height: 80rpx; border-radius: 40rpx; font-size: 28rpx;
