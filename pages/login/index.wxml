@@ -43,7 +43,7 @@
     bindtap="onLogin"
     disabled="{{isLoading}}"
   >
-    <text wx:if="{{!isLoading}}">微信授权登录</text>
+    <text wx:if="{{!isLoading}}">进入</text>
     <text wx:if="{{isLoading}}" class="loading-text">登录中...</text>
   </button>
 
