@@ -30,6 +30,7 @@ Page({
     // 快捷入口
     groupCount: 0,
     homeworkCount: 0,
+    sharedCount: 0,
     // 标签映射
     typeLabel: { single_choice: '单选', multiple_choice: '多选', fill_blank: '填空', essay: '简答' },
     diffLabel: { easy: '简单', medium: '中等', hard: '困难' }
@@ -50,6 +51,9 @@ Page({
     wx.cloud.callFunction({ name: 'getHomeworkList' }).then(res => {
       const list = res.result?.homeworkList || []
       this.setData({ homeworkCount: list.length })
+    }).catch(() => {})
+    wx.cloud.callFunction({ name: 'getSharedQuestions', data: { pageSize: 1 } }).then(res => {
+      this.setData({ sharedCount: res.result?.total || 0 })
     }).catch(() => {})
   },
 
@@ -317,5 +321,6 @@ Page({
   },
 
   goGroups() { wx.navigateTo({ url: '/pages/teacher/questionGroups/index' }) },
+  goSharedQuestions() { wx.navigateTo({ url: '/pages/teacher/sharedQuestions/index' }) },
   goHomeworkHistory() { wx.navigateTo({ url: '/pages/teacher/homeworkHistory/index' }) }
 })

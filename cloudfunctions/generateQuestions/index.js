@@ -66,6 +66,7 @@ exports.main = async (event) => {
 
     // 保存题目到数据库
     const teacherId = userRes.data[0]._id
+    const teacherInfo = userRes.data[0]
     const now = new Date()
     const savedQuestions = []
     for (const q of questions) {
@@ -85,6 +86,28 @@ exports.main = async (event) => {
         }
       })
       savedQuestions.push({ ...q, _id: res._id, createTime: now })
+
+      // 自动写入共享题库（失败不阻断主流程）
+      try {
+        const tags = Array.isArray(q.knowledgePoints) ? q.knowledgePoints.filter(t => t && t.trim()) : []
+        await db.collection('shared_questions').add({
+          data: {
+            questionId: res._id,
+            teacherId,
+            teacherName: teacherInfo.name || '匿名教师',
+            type: q.type || 'single_choice',
+            content: q.content || '',
+            options: Array.isArray(q.options) ? q.options : [],
+            answer: q.answer || '',
+            explanation: q.explanation || '',
+            difficulty: q.difficulty || 'medium',
+            tags,
+            createTime: now
+          }
+        })
+      } catch (e) {
+        console.log('写入共享题库失败（非致命）:', e.message)
+      }
     }
 
     return { success: true, questions: savedQuestions }

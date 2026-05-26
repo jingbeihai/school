@@ -72,13 +72,21 @@
     </view>
   </view>
 
-  <!-- 收藏组和已发作业快捷入口 -->
+  <!-- 收藏组、共享题库和已发作业快捷入口 -->
   <view class="quick-section" wx:if="{{!questions.length}}">
     <view class="quick-card" bindtap="goGroups">
       <view class="quick-icon">📁</view>
       <view class="quick-info">
         <text class="quick-title">收藏试题</text>
         <text class="quick-sub">{{groupCount}}个收藏组</text>
+      </view>
+      <text class="quick-arrow">→</text>
+    </view>
+    <view class="quick-card" bindtap="goSharedQuestions">
+      <view class="quick-icon">🌐</view>
+      <view class="quick-info">
+        <text class="quick-title">共享题库</text>
+        <text class="quick-sub">{{sharedCount}}道共享题目</text>
       </view>
       <text class="quick-arrow">→</text>
     </view>

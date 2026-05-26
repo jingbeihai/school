@@ -8,6 +8,7 @@
     "pages/teacher/publishHomework/index",
     "pages/teacher/questionGroups/index",
     "pages/teacher/groupQuestions/index",
+    "pages/teacher/sharedQuestions/index",
     "pages/teacher/homeworkHistory/index",
     "pages/teacher/homeworkDetail/index",
     "pages/teacher/reviewHomework/index",
