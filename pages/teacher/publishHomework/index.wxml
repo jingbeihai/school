@@ -14,12 +14,6 @@
     <button class="btn-primary" bindtap="onGenerateAI" loading="{{loading}}">{{loading?'生成中...':'🤖 AI生成试题'}}</button>
   </view>
 
-  <!-- 底部操作栏 -->
-  <view class="bottom-bar" wx:if="{{questions.length}}">
-    <button class="btn-bar" bindtap="onCollectToGroup">📁 收藏到组</button>
-    <button class="btn-bar primary" bindtap="onPublishHomework">📤 发布作业</button>
-  </view>
-
   <!-- 图片识别 -->
   <view class="tab-content" wx:if="{{activeTab==='ocr'}}">
     <view class="upload-box" bindtap="onChooseImage">
@@ -70,6 +64,12 @@
         <view class="q-explanation" wx:if="{{item.explanation}}">解析：{{item.explanation}}</view>
       </view>
     </checkbox-group>
+
+    <!-- 底部操作栏 -->
+    <view class="bottom-bar">
+      <button class="btn-bar" bindtap="onCollectToGroup">📁 收藏到组</button>
+      <button class="btn-bar primary" bindtap="onPublishHomework">📤 发布作业</button>
+    </view>
   </view>
 
   <!-- 收藏组、共享题库和已发作业快捷入口 -->
