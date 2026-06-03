@@ -87,6 +87,7 @@ Page({
         if (res.confirm) {
           wx.removeStorageSync('userInfo')
           wx.removeStorageSync('role')
+          wx.removeStorageSync('token')
           app.globalData.userInfo = null
           app.globalData.role = null
           wx.redirectTo({ url: '/pages/login/index' })
