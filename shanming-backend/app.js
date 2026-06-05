@@ -45,8 +45,8 @@ const { sequelize } = require('./models');
 
 sequelize.sync({ alter: process.env.DB_ALTER === 'true' }).then(() => {
   console.log('数据库同步完成');
-  app.listen(PORT, () => {
-    console.log(`服务已启动: http://localhost:${PORT}`);
+  app.listen(PORT, '127.0.0.1', () => {
+    console.log(`服务已启动: http://127.0.0.1:${PORT}`);
     console.log(`环境: ${process.env.NODE_ENV || 'development'}`);
   });
 }).catch(err => {

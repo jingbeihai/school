@@ -1,0 +1,17 @@
+[Unit]
+Description=Shanming Mini-Program Backend (Node.js)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/shanming-backend
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/node app.js
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
