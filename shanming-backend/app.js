@@ -45,16 +45,16 @@ const { sequelize } = require('./models');
 
 sequelize.sync({ alter: process.env.DB_ALTER === 'true' }).then(() => {
   console.log('数据库同步完成');
-  app.listen(PORT, '127.0.0.1', () => {
-    console.log(`服务已启动: http://127.0.0.1:${PORT}`);
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`服务已启动: http://0.0.0.0:${PORT}`);
     console.log(`环境: ${process.env.NODE_ENV || 'development'}`);
   });
 }).catch(err => {
   console.error('数据库同步失败:', err);
   // 即使数据库失败也启动服务，方便调试
-  app.listen(PORT, () => {
-    console.log(`服务已启动(数据库未连接): http://localhost:${PORT}`);
-  });
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`服务已启动(数据库未连接): http://localhost:${PORT}`);
+    });
 });
 
 module.exports = app;

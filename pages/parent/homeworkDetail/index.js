@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/parent/homeworkDetail/index.js
 Page({
   data: {
@@ -23,7 +24,7 @@ Page({
 
   loadData() {
     wx.showLoading({ title: '加载中...' })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getParentHomeworkDetail',
       data: {
         homeworkId: this.data.homeworkId,

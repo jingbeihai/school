@@ -2,7 +2,10 @@
   "compileType": "miniprogram",
   "libVersion": "3.16.1",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      { "type": "folder", "value": "cloudfunctions" },
+      { "type": "folder", "value": ".cloudbase" }
+    ],
     "include": []
   },
   "setting": {

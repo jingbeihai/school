@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/student/homeworkDetail/index.js
 const app = getApp()
 
@@ -70,7 +71,7 @@ Page({
   // 加载答题题目
   loadQuestions() {
     wx.showLoading({ title: '加载中...' })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getHomeworkQuestions',
       data: { homeworkId: this.data.homeworkId }
     }).then(res => {
@@ -127,7 +128,7 @@ Page({
   loadSubmissionDetail() {
     wx.showLoading({ title: '加载中...' })
     const cached = app.globalData.userInfo || {}
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getStudentHomeworkDetail',
       data: {
         homeworkId: this.data.homeworkId,
@@ -212,7 +213,7 @@ Page({
       return wx.showToast({ title: '请先作答', icon: 'none' })
     }
     this.setData({ submittingQuestionId: qid })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'submitAnswer',
       data: {
         homeworkId: this.data.homeworkId,
@@ -306,7 +307,7 @@ Page({
     const ids = this.getFavSelectedIds()
     if (!ids.length) return wx.showToast({ title: '请先点击题目旁的 ☆ 选择题目', icon: 'none' })
 
-    wx.cloud.callFunction({ name: 'getStudentGroups', data: { type: 'collection' } }).then(res => {
+    cloud.callFunction({ name: 'getStudentGroups', data: { type: 'collection' } }).then(res => {
       if (res.result.success) {
         this.setData({
           showFavModal: true,
@@ -340,7 +341,7 @@ Page({
     const ids = this.getFavSelectedIds()
 
     const doAdd = (groupId) => {
-      wx.cloud.callFunction({
+      cloud.callFunction({
         name: 'addQuestionsToStudentGroup',
         data: { groupId, questionIds: ids, homeworkId }
       }).then(res => {
@@ -357,7 +358,7 @@ Page({
     }
 
     if (favNewName.trim()) {
-      wx.cloud.callFunction({
+      cloud.callFunction({
         name: 'createStudentGroup',
         data: { name: favNewName.trim(), type: 'collection' }
       }).then(res => {

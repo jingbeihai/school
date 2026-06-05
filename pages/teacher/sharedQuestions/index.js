@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/teacher/sharedQuestions/index.js
 Page({
   data: {
@@ -37,7 +38,7 @@ Page({
 
     this.setData(append ? { loadingMore: true } : { loading: true })
 
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getSharedQuestions',
       data: { keyword: keyword.trim(), page, pageSize: 20 }
     }).then(res => {
@@ -113,7 +114,7 @@ Page({
     const ids = this.getSelectedIds()
     if (!ids.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
 
-    wx.cloud.callFunction({ name: 'getClassList' }).then(res => {
+    cloud.callFunction({ name: 'getClassList' }).then(res => {
       const list = res.result?.list || []
       if (!list.length) return wx.showToast({ title: '请先创建班级', icon: 'none' })
       this.setData({ showPublishModal: true, classList: list, selClassId: '' })
@@ -133,7 +134,7 @@ Page({
     const qIds = selectedQuestions.map(q => q.questionId)
 
     this.setData({ publishing: true })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'publishHomework',
       data: { classId: selClassId, questionIds: qIds, title: customTitle.trim() || undefined }
     }).then(res => {
@@ -155,7 +156,7 @@ Page({
     const ids = this.getSelectedIds()
     if (!ids.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
 
-    wx.cloud.callFunction({ name: 'getGroups' }).then(res => {
+    cloud.callFunction({ name: 'getGroups' }).then(res => {
       const list = res.result?.groups || []
       this.setData({ showCollectModal: true, groupList: list, selGroupId: '' })
     })
@@ -170,9 +171,9 @@ Page({
       placeholderText: '输入组名称',
       success: res => {
         if (res.confirm && res.content) {
-          wx.cloud.callFunction({ name: 'createGroup', data: { name: res.content } }).then(r => {
+          cloud.callFunction({ name: 'createGroup', data: { name: res.content } }).then(r => {
             if (r.result.success) {
-              wx.cloud.callFunction({ name: 'getGroups' }).then(gRes => {
+              cloud.callFunction({ name: 'getGroups' }).then(gRes => {
                 this.setData({
                   groupList: gRes.result?.groups || [],
                   selGroupId: r.result.groupId
@@ -196,7 +197,7 @@ Page({
     const qIds = selectedQuestions.map(q => q.questionId)
 
     this.setData({ collecting: true })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'addQuestionsToGroup',
       data: { groupId: selGroupId, questionIds: qIds }
     }).then(res => {

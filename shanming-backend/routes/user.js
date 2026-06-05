@@ -56,4 +56,14 @@ router.put('/profile', auth, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+router.get('/student-detail', auth, async (req, res, next) => {
+  try {
+    const { studentId } = req.query;
+    if (!studentId) return res.status(400).json(Response.fail('缺少学生ID'));
+    const student = await User.findOne({ where: { id: studentId, role: 'student' }, attributes: ['id', 'nickname', 'real_name', 'avatar', 'user_code', 'phone', 'is_vip', 'vip_expire_date', 'status', 'created_at'] });
+    if (!student) return res.status(404).json(Response.fail('学生不存在'));
+    res.json(Response.success({ student }));
+  } catch (err) { next(err); }
+});
+
 module.exports = router;

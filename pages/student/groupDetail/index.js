@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/student/groupDetail/index.js
 Page({
   data: {
@@ -19,7 +20,7 @@ Page({
 
   loadData() {
     wx.showLoading({ title: '加载中' })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getStudentGroupQuestions',
       data: { groupId: this.data.groupId }
     }).then(res => {
@@ -71,7 +72,7 @@ Page({
     if (!ids.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
 
     const groupType = this.data.group.type || 'collection'
-    wx.cloud.callFunction({ name: 'getStudentGroups', data: { type: groupType } }).then(res => {
+    cloud.callFunction({ name: 'getStudentGroups', data: { type: groupType } }).then(res => {
       const list = (res.result.groups || []).filter(g => g._id !== this.data.groupId)
       if (!list.length) return wx.showToast({ title: '暂无其他组', icon: 'none' })
       this.setData({ showMoveModal: true, targetGroups: list, selTargetGroupId: '' })
@@ -89,7 +90,7 @@ Page({
     if (!selTargetGroupId) return wx.showToast({ title: '请选择目标组', icon: 'none' })
 
     const ids = this.getSelectedIds()
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'moveStudentGroupQuestions',
       data: { fromGroupId: this.data.groupId, toGroupId: selTargetGroupId, questionIds: ids }
     }).then(res => {
@@ -115,7 +116,7 @@ Page({
       content: '确认将这些题目从该组中移除吗？题目本身不会删除。',
       success: res => {
         if (res.confirm) {
-          wx.cloud.callFunction({
+          cloud.callFunction({
             name: 'removeQuestionsFromStudentGroup',
             data: { groupId: this.data.groupId, questionIds: ids }
           }).then(r => {

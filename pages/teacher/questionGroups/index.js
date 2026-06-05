@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/teacher/questionGroups/index.js
 const { formatDate } = require('../../../utils/util.js')
 
@@ -8,7 +9,7 @@ Page({
 
   loadGroups() {
     wx.showLoading({ title: '加载中' })
-    wx.cloud.callFunction({ name: 'getGroups' }).then(res => {
+    cloud.callFunction({ name: 'getGroups' }).then(res => {
       wx.hideLoading()
       const groups = (res.result?.groups || []).map(item => ({
         ...item,
@@ -25,7 +26,7 @@ Page({
       placeholderText: '输入组名称',
       success: res => {
         if (res.confirm && res.content) {
-          wx.cloud.callFunction({ name: 'createGroup', data: { name: res.content } }).then(r => {
+          cloud.callFunction({ name: 'createGroup', data: { name: res.content } }).then(r => {
             if (r.result.success) this.loadGroups()
             else wx.showToast({ title: r.result.message, icon: 'none' })
           })
@@ -47,7 +48,7 @@ Page({
       content: `确定删除"${group.name}"吗？题目不会被删除。`,
       success: res => {
         if (res.confirm) {
-          wx.cloud.callFunction({ name: 'deleteGroup', data: { groupId: group._id } }).then(r => {
+          cloud.callFunction({ name: 'deleteGroup', data: { groupId: group._id } }).then(r => {
             if (r.result.success) {
               wx.showToast({ title: '已删除', icon: 'success' })
               this.loadGroups()

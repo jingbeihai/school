@@ -171,8 +171,30 @@ const handlers = {
     return { result: apiFail(res) };
   },
 
+  async getStudentClassDetail(data) {
+    const res = await get('/api/class/detail', { classId: data.classId });
+    if (res.code !== 0) return { result: apiFail(res) };
+    const cls = res.data;
+    const classInfo = {
+      _id: cls.id, name: cls.name, teacherName: cls.teacher_name || (cls.teacher ? cls.teacher.nickname : ''),
+      inviteCode: cls.invite_code, createTime: cls.created_at, status: cls.status,
+      studentCount: cls.student_count || (cls.students ? cls.students.length : 0),
+      joinTime: (cls.classInfo && cls.classInfo.joinTime) || cls.joinTime || cls.created_at
+    };
+    const teacherInfo = cls.teacher ? toCloudObject({
+      nickname: cls.teacher.nickname, avatar: cls.teacher.avatar, real_name: cls.teacher.real_name
+    }) : {};
+    return { result: { success: true, classInfo, teacherInfo } };
+  },
+
+  async getStudentDetail(data) {
+    const res = await get('/api/user/student-detail', { studentId: data.studentId, classId: data.classId });
+    if (res.code !== 0) return { result: apiFail(res) };
+    return { result: { success: true, student: toCloudObject(res.data.student) } };
+  },
+
   async addStudentToClass(data) {
-    const res = await post('/api/class/add-student', data);
+    const res = await post('/api/class/add-student', { classId: data.classId, userCode: data.userCode, studentId: data.studentId });
     return { result: res.code === 0 ? { success: true } : apiFail(res) };
   },
 
@@ -384,7 +406,19 @@ const handlers = {
   async getParentStudentDetail(data) {
     const res = await get('/api/parent/student-detail', { studentId: data.studentId });
     if (res.code !== 0) return { result: apiFail(res) };
-    return { result: { success: true, ...res.data, student: toCloudObject(res.data.student) } };
+    const student = res.data.student ? toCloudObject(res.data.student) : {};
+    const studentInfo = {
+      _id: student._id || student.id,
+      nickName: student.nickName || student.nickname || student.real_name || '',
+      avatarUrl: student.avatarUrl || student.avatar || '',
+      userCode: student.userCode || student.user_code || '',
+      createTime: student.createTime || student.created_at || ''
+    };
+    const classList = (res.data.classes || []).map(c => toCloudObject({
+      _id: c.id, name: c.name, teacherName: c.teacher_name || '',
+      studentCount: c.student_count, inviteCode: c.invite_code
+    }));
+    return { result: { success: true, studentInfo, classList, recentScores: res.data.recentScores || [] } };
   },
 
   async linkStudent(data) {
@@ -393,7 +427,7 @@ const handlers = {
   },
 
   async unlinkStudent(data) {
-    const res = await del('/api/parent/unlink', { studentId: data.studentId });
+    const res = await del('/api/parent/unlink', { studentId: data.studentId || data.relationId });
     return { result: res.code === 0 ? { success: true } : apiFail(res) };
   },
 

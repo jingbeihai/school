@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/student/classDetail/index.js
 Page({
   data: {
@@ -13,7 +14,7 @@ Page({
 
   loadData() {
     wx.showLoading({ title: '加载中' })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getStudentClassDetail',
       data: { classId: this.data.classId }
     }).then(res => {
@@ -63,7 +64,7 @@ Page({
       success: (res) => {
         if (res.confirm) {
           wx.showLoading({ title: '退出中...' })
-          wx.cloud.callFunction({
+          cloud.callFunction({
             name: 'leaveClass',
             data: { classId: this.data.classId }
           }).then(res => {

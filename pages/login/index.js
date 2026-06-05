@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/login/index.js
 const app = getApp()
 
@@ -34,7 +35,7 @@ Page({
 
   // 执行登录
   doLogin(role, nickName, avatarUrl) {
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'login',
       data: { role, nickName, avatarUrl }
     }).then(res => {

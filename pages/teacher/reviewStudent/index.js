@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 Page({
   data: {
     homeworkId: '',
@@ -25,7 +26,7 @@ Page({
 
   loadData() {
     wx.showLoading({ title: '加载中...' })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getStudentHomeworkDetail',
       data: {
         homeworkId: this.data.homeworkId,
@@ -132,7 +133,7 @@ Page({
 
     try {
       for (const qId in questionComments) {
-        await wx.cloud.callFunction({
+        await cloud.callFunction({
           name: 'saveComment',
           data: { submissionId, questionId: qId, comment: questionComments[qId] }
         })

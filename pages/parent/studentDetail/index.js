@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/parent/studentDetail/index.js
 Page({
   data: {
@@ -18,7 +19,7 @@ Page({
 
   loadData() {
     wx.showLoading({ title: '加载中' })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getParentStudentDetail',
       data: {
         relationId: this.data.relationId,
@@ -74,9 +75,9 @@ Page({
       success: (res) => {
         if (res.confirm) {
           wx.showLoading({ title: '解除中...' })
-          wx.cloud.callFunction({
+          cloud.callFunction({
             name: 'unlinkStudent',
-            data: { relationId: this.data.relationId }
+            data: { studentId: this.data.studentId, relationId: this.data.relationId }
           }).then(res => {
             wx.hideLoading()
             if (res.result.success) {

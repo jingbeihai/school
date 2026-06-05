@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/student/questionBank/index.js
 const app = getApp()
 
@@ -24,7 +25,7 @@ Page({
   },
 
   loadGroups(type) {
-    wx.cloud.callFunction({ name: 'getStudentGroups', data: { type } }).then(res => {
+    cloud.callFunction({ name: 'getStudentGroups', data: { type } }).then(res => {
       if (res.result.success) {
         if (type === 'collection') {
           this.setData({ collectionGroups: res.result.groups })
@@ -66,7 +67,7 @@ Page({
     if (!createName.trim()) {
       return wx.showToast({ title: '请输入名称', icon: 'none' })
     }
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'createStudentGroup',
       data: { name: createName.trim(), type: createType }
     }).then(res => {
@@ -97,7 +98,7 @@ Page({
       content: `确定删除"${name}"吗？题目不会被删除。`,
       success: res => {
         if (res.confirm) {
-          wx.cloud.callFunction({
+          cloud.callFunction({
             name: 'deleteStudentGroup',
             data: { groupId: id }
           }).then(r => {

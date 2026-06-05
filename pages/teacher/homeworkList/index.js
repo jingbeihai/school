@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 const { formatDate } = require('../../../utils/util.js')
 
 Page({
@@ -17,7 +18,7 @@ Page({
   loadData() {
     this.setData({ loading: true, error: '' })
     wx.showLoading({ title: '加载中...' })
-    wx.cloud.callFunction({ name: 'getHomeworkForReview' }).then(res => {
+    cloud.callFunction({ name: 'getHomeworkForReview' }).then(res => {
       wx.hideLoading()
       const r = res.result
       if (r.success) {

@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/teacher/publishHomework/index.js
 const app = getApp()
 
@@ -44,15 +45,15 @@ Page({
   },
 
   loadQuickData() {
-    wx.cloud.callFunction({ name: 'getGroups' }).then(res => {
+    cloud.callFunction({ name: 'getGroups' }).then(res => {
       const groups = res.result?.groups || []
       this.setData({ groupCount: groups.length, groupList: groups })
     }).catch(() => {})
-    wx.cloud.callFunction({ name: 'getHomeworkList' }).then(res => {
+    cloud.callFunction({ name: 'getHomeworkList' }).then(res => {
       const list = res.result?.homeworkList || []
       this.setData({ homeworkCount: list.length })
     }).catch(() => {})
-    wx.cloud.callFunction({ name: 'getSharedQuestions', data: { pageSize: 1 } }).then(res => {
+    cloud.callFunction({ name: 'getSharedQuestions', data: { pageSize: 1 } }).then(res => {
       this.setData({ sharedCount: res.result?.total || 0 })
     }).catch(() => {})
   },
@@ -75,7 +76,7 @@ Page({
 
     this.setData({ loading: true })
     wx.showLoading({ title: 'AI生成中...' })
-    wx.cloud.callFunction({ name: 'generateQuestions', data: { userPrompt: aiPrompt } }).then(res => {
+    cloud.callFunction({ name: 'generateQuestions', data: { userPrompt: aiPrompt } }).then(res => {
       wx.hideLoading()
       const result = res.result
       if (result.success) {
@@ -100,7 +101,7 @@ Page({
       success: res => {
         const path = res.tempFiles[0].tempFilePath
         wx.showLoading({ title: '上传中...' })
-        wx.cloud.uploadFile({
+        cloud.uploadFile({
           cloudPath: 'ocr/' + Date.now() + '.png',
           filePath: path
         }).then(r => {
@@ -118,7 +119,7 @@ Page({
 
     this.setData({ loading: true })
     wx.showLoading({ title: '识别中...' })
-    wx.cloud.callFunction({ name: 'ocrImage', data: { fileID: ocrFileID } }).then(res => {
+    cloud.callFunction({ name: 'ocrImage', data: { fileID: ocrFileID } }).then(res => {
       wx.hideLoading()
       const r = res.result
       if (r.success) {
@@ -157,7 +158,7 @@ Page({
           return wx.showToast({ title: '仅支持 txt/doc/docx/pdf', icon: 'none' })
         }
         wx.showLoading({ title: '上传中...' })
-        wx.cloud.uploadFile({
+        cloud.uploadFile({
           cloudPath: 'docs/' + Date.now() + '.' + ext,
           filePath: file.path
         }).then(r => {
@@ -175,7 +176,7 @@ Page({
 
     this.setData({ loading: true })
     wx.showLoading({ title: '解析中...' })
-    wx.cloud.callFunction({ name: 'parseDocument', data: { fileID, fileType } }).then(res => {
+    cloud.callFunction({ name: 'parseDocument', data: { fileID, fileType } }).then(res => {
       wx.hideLoading()
       const r = res.result
       if (r.success) {
@@ -216,7 +217,7 @@ Page({
     if (!selected.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
 
     // 加载班级列表
-    wx.cloud.callFunction({ name: 'getClassList' }).then(res => {
+    cloud.callFunction({ name: 'getClassList' }).then(res => {
       const list = res.result?.list || []
       if (!list.length) return wx.showToast({ title: '请先创建班级', icon: 'none' })
       this.setData({ showPublishModal: true, classList: list, selClassId: '' })
@@ -234,7 +235,7 @@ Page({
 
     const qIds = questions.filter(q => q.checked).map(q => q._id)
     this.setData({ publishing: true })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'publishHomework',
       data: { classId: selClassId, questionIds: qIds, title: customTitle.trim() || undefined }
     }).then(res => {
@@ -258,7 +259,7 @@ Page({
     const selected = this.data.questions.filter(q => q.checked)
     if (!selected.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
 
-    wx.cloud.callFunction({ name: 'getGroups' }).then(res => {
+    cloud.callFunction({ name: 'getGroups' }).then(res => {
       const list = res.result?.groups || []
       this.setData({ showCollectModal: true, groupList: list, selGroupId: '' })
     })
@@ -273,9 +274,9 @@ Page({
       placeholderText: '输入组名称',
       success: res => {
         if (res.confirm && res.content) {
-          wx.cloud.callFunction({ name: 'createGroup', data: { name: res.content } }).then(r => {
+          cloud.callFunction({ name: 'createGroup', data: { name: res.content } }).then(r => {
             if (r.result.success) {
-              wx.cloud.callFunction({ name: 'getGroups' }).then(gRes => {
+              cloud.callFunction({ name: 'getGroups' }).then(gRes => {
                 this.setData({
                   groupList: gRes.result?.groups || [],
                   selGroupId: r.result.groupId
@@ -297,7 +298,7 @@ Page({
 
     const qIds = questions.filter(q => q.checked).map(q => q._id)
     this.setData({ collecting: true })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'addQuestionsToGroup',
       data: { groupId: selGroupId, questionIds: qIds }
     }).then(res => {

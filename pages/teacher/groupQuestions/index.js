@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/teacher/groupQuestions/index.js
 Page({
   data: {
@@ -16,7 +17,7 @@ Page({
 
   loadData() {
     wx.showLoading({ title: '加载中' })
-    wx.cloud.callFunction({ name: 'getGroupQuestions', data: { groupId: this.data.groupId } }).then(res => {
+    cloud.callFunction({ name: 'getGroupQuestions', data: { groupId: this.data.groupId } }).then(res => {
       wx.hideLoading()
       const r = res.result
       const qs = (r.questions || []).map(q => ({ ...q, checked: false }))
@@ -44,7 +45,7 @@ Page({
   onRepublish() {
     const ids = this.getSelectedIds()
     if (!ids.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
-    wx.cloud.callFunction({ name: 'getClassList' }).then(res => {
+    cloud.callFunction({ name: 'getClassList' }).then(res => {
       const list = res.result?.list || []
       if (!list.length) return wx.showToast({ title: '请先创建班级', icon: 'none' })
       this.setData({ showClassModal: true, classList: list, selClassId: '' })
@@ -59,7 +60,7 @@ Page({
     const { selClassId, customTitle } = this.data
     if (!selClassId) return wx.showToast({ title: '请选择班级', icon: 'none' })
     const ids = this.getSelectedIds()
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'reuseQuestions',
       data: { sourceType: 'group', sourceId: this.data.groupId, targetType: 'homework', questionIds: ids, classId: selClassId, title: customTitle.trim() || undefined }
     }).then(res => {
@@ -76,7 +77,7 @@ Page({
   onMoveToGroup() {
     const ids = this.getSelectedIds()
     if (!ids.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
-    wx.cloud.callFunction({ name: 'getGroups' }).then(res => {
+    cloud.callFunction({ name: 'getGroups' }).then(res => {
       const list = (res.result?.groups || []).filter(g => g._id !== this.data.groupId)
       if (!list.length) return wx.showToast({ title: '暂无其他组', icon: 'none' })
       this.setData({ showGroupModal: true, groupList: list, selGroupId: '' })
@@ -89,7 +90,7 @@ Page({
     const { selGroupId } = this.data
     if (!selGroupId) return wx.showToast({ title: '请选择目标组', icon: 'none' })
     const ids = this.getSelectedIds()
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'reuseQuestions',
       data: { sourceType: 'group', sourceId: this.data.groupId, targetType: 'group', targetId: selGroupId, questionIds: ids }
     }).then(res => {
@@ -112,7 +113,7 @@ Page({
       content: '确认将这些题目从该组中移除吗？题目本身不会删除。',
       success: res => {
         if (res.confirm) {
-          wx.cloud.callFunction({
+          cloud.callFunction({
             name: 'removeQuestionsFromGroup',
             data: { groupId: this.data.groupId, questionIds: ids }
           }).then(r => {

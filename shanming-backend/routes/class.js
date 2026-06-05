@@ -78,7 +78,10 @@ router.get('/detail', auth, async (req, res, next) => {
       classInfo: {
         _id: cls.id, name: cls.name, teacherId: cls.teacher_id,
         teacherName: cls.teacher_name || (cls.teacher ? cls.teacher.nickname : ''),
-        inviteCode: cls.invite_code, createTime: cls.created_at, status: cls.status, studentCount: students.length
+        inviteCode: cls.invite_code, createTime: cls.created_at, status: cls.status, studentCount: students.length,
+        joinTime: (cls.ClassStudents || []).find(cs => cs.student_id === req.userId) ?
+          ((cls.ClassStudents || []).find(cs => cs.student_id === req.userId).joined_at ||
+           (cls.ClassStudents || []).find(cs => cs.student_id === req.userId).created_at) : null
       }
     }));
   } catch (err) { next(err); }
@@ -142,15 +145,24 @@ router.post('/leave', auth, async (req, res, next) => {
 router.post('/add-student', auth, async (req, res, next) => {
   try {
     if (req.role !== 'teacher') return res.status(403).json(Response.fail('仅教师可操作'));
-    const { classId, studentId } = req.body;
+    const { classId, studentId, userCode } = req.body;
     const cls = await Class.findOne({ where: { id: classId, teacher_id: req.userId } });
     if (!cls) return res.status(404).json(Response.fail('班级不存在或无权限'));
-    const existing = await ClassStudent.findOne({ where: { class_id: classId, student_id: studentId } });
+
+    let targetStudentId = studentId;
+    if (!targetStudentId && userCode) {
+      const student = await User.findOne({ where: { user_code: userCode, role: 'student' } });
+      if (!student) return res.status(404).json(Response.fail('未找到该识别码对应的学生'));
+      targetStudentId = student.id;
+    }
+    if (!targetStudentId) return res.status(400).json(Response.fail('请提供学生ID或识别码'));
+
+    const existing = await ClassStudent.findOne({ where: { class_id: classId, student_id: targetStudentId } });
     if (existing) {
       if (existing.status === 'left') { await existing.update({ status: 'active' }); await cls.increment('student_count'); return res.json(Response.success(null, '已重新添加')); }
       return res.json(Response.fail('该学生已在班级中'));
     }
-    await ClassStudent.create({ class_id: classId, student_id: studentId });
+    await ClassStudent.create({ class_id: classId, student_id: targetStudentId });
     await cls.increment('student_count');
     res.json(Response.success(null, '添加成功'));
   } catch (err) { next(err); }

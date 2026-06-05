@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/teacher/homeworkDetail/index.js
 const { formatDate } = require('../../../utils/util.js')
 
@@ -18,7 +19,7 @@ Page({
 
   loadData() {
     wx.showLoading({ title: '加载中' })
-    wx.cloud.callFunction({ name: 'getHomeworkQuestions', data: { homeworkId: this.data.homeworkId } }).then(res => {
+    cloud.callFunction({ name: 'getHomeworkQuestions', data: { homeworkId: this.data.homeworkId } }).then(res => {
       wx.hideLoading()
       const r = res.result
       const hw = r.homework ? { ...r.homework, publishTime: formatDate(r.homework.publishTime), deadline: formatDate(r.homework.deadline) } : null
@@ -47,7 +48,7 @@ Page({
   onRepublish() {
     const ids = this.getSelectedIds()
     if (!ids.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
-    wx.cloud.callFunction({ name: 'getClassList' }).then(res => {
+    cloud.callFunction({ name: 'getClassList' }).then(res => {
       const list = res.result?.list || []
       if (!list.length) return wx.showToast({ title: '请先创建班级', icon: 'none' })
       this.setData({ showClassModal: true, classList: list, selClassId: '' })
@@ -62,7 +63,7 @@ Page({
     const { selClassId, customTitle } = this.data
     if (!selClassId) return wx.showToast({ title: '请选择班级', icon: 'none' })
     const ids = this.getSelectedIds()
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'reuseQuestions',
       data: { sourceType: 'homework', sourceId: this.data.homeworkId, targetType: 'homework', questionIds: ids, classId: selClassId, title: customTitle.trim() || undefined }
     }).then(res => {
@@ -79,7 +80,7 @@ Page({
   onCollect() {
     const ids = this.getSelectedIds()
     if (!ids.length) return wx.showToast({ title: '请勾选题目', icon: 'none' })
-    wx.cloud.callFunction({ name: 'getGroups' }).then(res => {
+    cloud.callFunction({ name: 'getGroups' }).then(res => {
       this.setData({ showGroupModal: true, groupList: res.result?.groups || [], selGroupId: '' })
     })
   },
@@ -93,9 +94,9 @@ Page({
       placeholderText: '输入组名称',
       success: res => {
         if (res.confirm && res.content) {
-          wx.cloud.callFunction({ name: 'createGroup', data: { name: res.content } }).then(r => {
+          cloud.callFunction({ name: 'createGroup', data: { name: res.content } }).then(r => {
             if (r.result.success) {
-              wx.cloud.callFunction({ name: 'getGroups' }).then(gRes => {
+              cloud.callFunction({ name: 'getGroups' }).then(gRes => {
                 this.setData({ groupList: gRes.result?.groups || [], selGroupId: r.result.groupId })
               })
             }
@@ -109,7 +110,7 @@ Page({
     const { selGroupId } = this.data
     if (!selGroupId) return wx.showToast({ title: '请选择收藏组', icon: 'none' })
     const ids = this.getSelectedIds()
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'reuseQuestions',
       data: { sourceType: 'homework', sourceId: this.data.homeworkId, targetType: 'group', targetId: selGroupId, questionIds: ids }
     }).then(res => {

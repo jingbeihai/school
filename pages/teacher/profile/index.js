@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/teacher/profile/index.js
 const app = getApp()
 
@@ -49,7 +50,7 @@ Page({
   // 从后端同步最新用户信息
   syncUserInfo() {
     const role = wx.getStorageSync('role') || 'teacher'
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'login',
       data: { role, nickName: '', avatarUrl: '' }
     }).then(res => {
@@ -66,7 +67,7 @@ Page({
 
   // 获取班级列表
   fetchClassList() {
-    wx.cloud.callFunction({ name: 'getClassList' }).then(res => {
+    cloud.callFunction({ name: 'getClassList' }).then(res => {
       if (res.result.success) {
         // 为每个班级分配固定渐变色
         const list = (res.result.list || []).map((item, i) => {
@@ -116,7 +117,7 @@ Page({
       return
     }
     this.setData({ creating: true })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'createClass',
       data: { name: newClassName.trim(), inviteCode: newInviteCode.trim() || undefined }
     }).then(res => {
@@ -163,7 +164,7 @@ Page({
   async uploadAvatar(tempPath) {
     const cloudPath = 'avatars/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.png'
     try {
-      const res = await wx.cloud.uploadFile({ cloudPath, filePath: tempPath })
+      const res = await cloud.uploadFile({ cloudPath, filePath: tempPath })
       return res.fileID
     } catch (err) {
       console.error('上传头像失败:', err)
@@ -188,7 +189,7 @@ Page({
         }
       }
 
-      const res = await wx.cloud.callFunction({
+      const res = await cloud.callFunction({
         name: 'updateUserProfile',
         data: { role: userInfo.role, nickName: editNickName.trim(), phone: editPhone.trim(), avatarUrl: avatarUrl || undefined }
       })

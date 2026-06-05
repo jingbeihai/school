@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/student/homework/index.js
 const { formatDate } = require('../../../utils/util.js')
 
@@ -16,7 +17,7 @@ Page({
 
   loadData() {
     this.setData({ loading: true })
-    wx.cloud.callFunction({ name: 'getStudentHomeworkList' }).then(res => {
+    cloud.callFunction({ name: 'getStudentHomeworkList' }).then(res => {
       this.setData({ loading: false })
       if (res.result.success) {
         const list = (res.result.list || []).map(item => ({

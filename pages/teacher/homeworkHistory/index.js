@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/teacher/homeworkHistory/index.js
 const { formatDate } = require('../../../utils/util.js')
 
@@ -8,7 +9,7 @@ Page({
 
   loadList() {
     wx.showLoading({ title: '加载中' })
-    wx.cloud.callFunction({ name: 'getHomeworkList' }).then(res => {
+    cloud.callFunction({ name: 'getHomeworkList' }).then(res => {
       wx.hideLoading()
       const list = (res.result?.homeworkList || []).map(item => ({
         ...item,
@@ -46,7 +47,7 @@ Page({
       content: `确认撤回"${title}"吗？撤回后学生将无法提交。`,
       success: res => {
         if (res.confirm) {
-          wx.cloud.callFunction({ name: 'withdrawHomework', data: { homeworkId: id } }).then(r => {
+          cloud.callFunction({ name: 'withdrawHomework', data: { homeworkId: id } }).then(r => {
             if (r.result.success) {
               wx.showToast({ title: '已撤回', icon: 'success' })
               this.loadList()
@@ -65,7 +66,7 @@ Page({
       content: `确认删除"${title}"吗？题目不会被删除。`,
       success: res => {
         if (res.confirm) {
-          wx.cloud.callFunction({ name: 'deleteHomework', data: { homeworkId: id } }).then(r => {
+          cloud.callFunction({ name: 'deleteHomework', data: { homeworkId: id } }).then(r => {
             if (r.result.success) {
               wx.showToast({ title: '已删除', icon: 'success' })
               this.loadList()

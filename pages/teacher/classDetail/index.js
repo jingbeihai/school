@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/teacher/classDetail/index.js
 const app = getApp()
 
@@ -31,7 +32,7 @@ Page({
 
   fetchDetail() {
     wx.showLoading({ title: '加载中' })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getClassDetail',
       data: { classId: this.data.classId }
     }).then(res => {
@@ -82,7 +83,7 @@ Page({
     const name = this.data.editName.trim()
     if (!name) return wx.showToast({ title: '请输入名称', icon: 'none' })
     this.setData({ saving: true })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'updateClass',
       data: { classId: this.data.classId, name }
     }).then(res => {
@@ -113,7 +114,7 @@ Page({
       return
     }
     this.setData({ adding: true })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'addStudentToClass',
       data: { classId: this.data.classId, userCode: code }
     }).then(res => {
@@ -136,7 +137,7 @@ Page({
     const id = e.currentTarget.dataset.id
     const name = e.currentTarget.dataset.name
     wx.showLoading({ title: '加载中' })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getStudentDetail',
       data: { studentId: id, classId: this.data.classId }
     }).then(res => {
@@ -164,7 +165,7 @@ Page({
       content: '确定要从班级中移除该学生吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.cloud.callFunction({
+          cloud.callFunction({
             name: 'removeStudentFromClass',
             data: { classId: this.data.classId, studentId: this.data.currentStudentId }
           }).then(res => {
@@ -189,7 +190,7 @@ Page({
       confirmColor: '#e74c3c',
       success: (res) => {
         if (res.confirm) {
-          wx.cloud.callFunction({
+          cloud.callFunction({
             name: 'deleteClass',
             data: { classId: this.data.classId }
           }).then(res => {

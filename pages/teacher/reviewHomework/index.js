@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 const { formatDate } = require('../../../utils/util.js')
 
 Page({
@@ -18,7 +19,7 @@ Page({
   loadData() {
     this.setData({ loading: true })
     wx.showLoading({ title: '加载中...' })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'getHomeworkStudentsProgress',
       data: { homeworkId: this.data.homeworkId }
     }).then(res => {

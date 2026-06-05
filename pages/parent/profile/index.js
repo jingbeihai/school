@@ -1,3 +1,4 @@
+const cloud = require('../../utils/cloud')
 // pages/parent/profile/index.js
 const app = getApp()
 
@@ -45,7 +46,7 @@ Page({
 
   syncUserInfo() {
     const role = wx.getStorageSync('role') || 'parent'
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'login',
       data: { role, nickName: '', avatarUrl: '' }
     }).then(res => {
@@ -61,7 +62,7 @@ Page({
   },
 
   fetchStudentList() {
-    wx.cloud.callFunction({ name: 'getParentStudents' }).then(res => {
+    cloud.callFunction({ name: 'getParentStudents' }).then(res => {
       if (res.result.success) {
         const students = (res.result.students || []).map((item, i) => {
           const pair = CARD_GRADIENTS[i % CARD_GRADIENTS.length]
@@ -109,7 +110,7 @@ Page({
       return
     }
     this.setData({ linking: true })
-    wx.cloud.callFunction({
+    cloud.callFunction({
       name: 'linkStudent',
       data: { code }
     }).then(res => {
@@ -154,7 +155,7 @@ Page({
   async uploadAvatar(tempPath) {
     const cloudPath = 'avatars/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.png'
     try {
-      const res = await wx.cloud.uploadFile({ cloudPath, filePath: tempPath })
+      const res = await cloud.uploadFile({ cloudPath, filePath: tempPath })
       return res.fileID
     } catch (err) {
       console.error('上传头像失败:', err)
@@ -178,7 +179,7 @@ Page({
         }
       }
 
-      const res = await wx.cloud.callFunction({
+      const res = await cloud.callFunction({
         name: 'updateUserProfile',
         data: {
           role: userInfo.role || 'parent',
