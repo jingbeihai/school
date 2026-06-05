@@ -1,7 +1,6 @@
 {
-  "cloudfunctionRoot": "cloudfunctions/",
   "compileType": "miniprogram",
-  "libVersion": "trial",
+  "libVersion": "3.16.1",
   "packOptions": {
     "ignore": [],
     "include": []
@@ -37,6 +36,6 @@
     "tabIndent": "auto",
     "tabSize": 2
   },
-  "appid": "wx3ee763dae5853948",
+  "appid": "wx6f467e6f58d1cb35",
   "simulatorPluginLibVersion": {}
 }

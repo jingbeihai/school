@@ -1,6 +1,17 @@
 // app.js
 const cloudAdapter = require('./utils/cloud')
 
+// 必须在 App 启动前覆盖 wx.cloud，否则会走微信云开发（报 -601034）
+function installCloudAdapter() {
+  wx.cloud = {
+    init: cloudAdapter.init.bind(cloudAdapter),
+    callFunction: cloudAdapter.callFunction.bind(cloudAdapter),
+    uploadFile: cloudAdapter.uploadFile.bind(cloudAdapter)
+  }
+}
+
+installCloudAdapter()
+
 App({
   globalData: {
     userInfo: null,
@@ -8,10 +19,8 @@ App({
   },
 
   onLaunch() {
-    // 使用自建后端替代微信云开发
-    wx.cloud = cloudAdapter
     wx.cloud.init()
-
+    console.log('已使用自建后端，非微信云开发')
     this.checkLoginStatus()
   },
 
