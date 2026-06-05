@@ -1,4 +1,4 @@
-const cloud = require('../../utils/cloud')
+const cloud = require('../../utils/cloud.js')
 // pages/parent/homeworkDetail/index.js
 Page({
   data: {

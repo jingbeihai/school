@@ -4,7 +4,7 @@
   <!-- 学生信息头部 -->
   <view class="header-card">
     <view class="header-top">
-      <image class="student-avatar" src="{{studentInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <image class="student-avatar" src="{{studentInfo.avatarUrl || defaultAvatar}}" mode="aspectFill"></image>
       <text class="student-name">{{studentInfo.nickName}}</text>
     </view>
     <view class="invite-row" bindtap="onCopyCode">

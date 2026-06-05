@@ -1,4 +1,4 @@
-const cloud = require('../../utils/cloud')
+const cloud = require('../../utils/cloud.js')
 const { formatDate } = require('../../../utils/util.js')
 
 Page({

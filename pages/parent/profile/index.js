@@ -1,4 +1,5 @@
-const cloud = require('../../utils/cloud')
+const cloud = require('../../utils/cloud.js')
+const config = require('../../utils/config.js')
 // pages/parent/profile/index.js
 const app = getApp()
 
@@ -15,6 +16,7 @@ const CARD_GRADIENTS = [
 
 Page({
   data: {
+    defaultAvatar: config.defaultAvatar,
     userInfo: {},
     studentList: [],
     showLinkModal: false,

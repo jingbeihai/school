@@ -1,7 +1,9 @@
-const cloud = require('../../utils/cloud')
+const cloud = require('../../utils/cloud.js')
+const config = require('../../utils/config.js')
 // pages/parent/studentDetail/index.js
 Page({
   data: {
+    defaultAvatar: config.defaultAvatar,
     relationId: '',
     studentId: '',
     studentInfo: {},

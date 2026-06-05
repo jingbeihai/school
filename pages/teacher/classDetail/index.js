@@ -1,9 +1,11 @@
-const cloud = require('../../utils/cloud')
+const cloud = require('../../utils/cloud.js')
+const config = require('../../utils/config.js')
 // pages/teacher/classDetail/index.js
 const app = getApp()
 
 Page({
   data: {
+    defaultAvatar: config.defaultAvatar,
     classId: '',
     classInfo: null,
     students: [],

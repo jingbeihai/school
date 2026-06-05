@@ -23,6 +23,7 @@ Component({
       const role = app.globalData.role || wx.getStorageSync('role') || 'teacher'
       const pages = getCurrentPages()
       const currentPage = pages[pages.length - 1]
+      if (!currentPage || !currentPage.route) return
       const currentPath = '/' + currentPage.route
 
       let tabs = []

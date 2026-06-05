@@ -27,7 +27,7 @@
 
     <view class="student-list">
       <view class="student-item" wx:for="{{students}}" wx:key="_id" bindtap="onStudentTap" data-id="{{item.studentId}}" data-name="{{item.studentName}}">
-        <image class="student-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <image class="student-avatar" src="{{item.avatarUrl || defaultAvatar}}" mode="aspectFill"></image>
         <view class="student-info">
           <text class="student-name">{{item.studentName}}</text>
           <text class="student-code">编号：{{item.userCode || '无'}} ｜ 家长：{{item.parentName}}</text>

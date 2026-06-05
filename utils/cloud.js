@@ -80,10 +80,15 @@ function request(method, path, data = {}, needAuth = true) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data);
         } else {
-          reject(res.data || { message: '请求失败 ' + res.statusCode });
+          console.error(`[API ${method} ${path}] 状态码: ${res.statusCode}`, res.data);
+          const errMsg = (res.data && res.data.message) ? res.data.message : ('请求失败 ' + res.statusCode);
+          reject({ code: res.statusCode, message: errMsg, path });
         }
       },
-      fail: (err) => reject(err)
+      fail: (err) => {
+        console.error(`[API ${method} ${path}] 网络错误:`, err);
+        reject({ code: -1, message: '网络请求失败，请检查网络连接', path });
+      }
     });
   });
 }

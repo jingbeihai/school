@@ -1,5 +1,5 @@
 // app.js
-const cloud = require('./utils/cloud')
+const cloud = require('./utils/cloud.js')
 
 App({
   globalData: {

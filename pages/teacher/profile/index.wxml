@@ -4,7 +4,7 @@
   <!-- 个人信息区域 -->
   <view class="profile-card">
     <view class="profile-info" bindtap="onEditProfile">
-      <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <image class="avatar" src="{{userInfo.avatarUrl || defaultAvatar}}" mode="aspectFill"></image>
       <view class="profile-text">
         <text class="nick-name">{{userInfo.nickName || '教师'}}</text>
         <text class="user-code">编号：{{userInfo.userCode || ''}}</text>
@@ -59,7 +59,7 @@
 <view class="modal-dialog" wx:if="{{showEditModal}}">
   <text class="modal-title">修改信息</text>
   <view class="edit-avatar-wrap">
-    <image class="edit-avatar" src="{{editAvatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+    <image class="edit-avatar" src="{{editAvatarUrl || defaultAvatar}}" mode="aspectFill"></image>
     <button class="edit-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">更换头像</button>
   </view>
   <input class="modal-input" placeholder="昵称" value="{{editNickName}}" bindinput="onEditNickNameInput"/>

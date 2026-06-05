@@ -24,7 +24,7 @@
       <text class="card-icon">🧑‍🏫</text>
     </view>
     <view class="teacher-content">
-      <image class="teacher-avatar" src="{{teacherInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <image class="teacher-avatar" src="{{teacherInfo.avatarUrl || defaultAvatar}}" mode="aspectFill"></image>
       <view class="teacher-info">
         <text class="teacher-name">{{teacherInfo.teacherName || '未知'}}</text>
         <text class="teacher-code" wx:if="{{teacherInfo.userCode}}">编号：{{teacherInfo.userCode}}</text>
